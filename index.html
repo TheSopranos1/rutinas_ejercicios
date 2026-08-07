@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>💪🏽 Rutinas</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0284c7',
+              600: '#0369a1',
+              900: '#0c4a6e',
+              accent: '#38bdf8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Mobile Touch Optimizations */
+    body {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      background: transparent;
+      bottom: 0;
+      color: transparent;
+      height: auto;
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: auto;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between pb-10">
+
+  <!-- Header -->
+  <header class="bg-slate-900 border-b border-slate-800 p-4 sticky top-0 z-30 shadow-md">
+    <div class="max-w-md mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-2">
+        <div class="bg-brand-500 text-slate-950 p-2 rounded-lg font-black text-xl">💪🏽</div>
+        <h1 class="text-xl font-bold tracking-tight text-white">Rutinas</h1>
+      </div>
+      <button onclick="toggleView()" id="nav-btn" class="text-xs bg-slate-800 hover:bg-slate-700 text-brand-accent px-3 py-1.5 rounded-lg border border-slate-700 font-medium transition flex items-center gap-1.5">
+        <i class="fa-solid font-black fa-sliders"></i>
+        <span>Progresión</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-md mx-auto w-full p-4 flex-1">
+
+    <!-- VISTA PRINCIPAL: SELECCIÓN -->
+    <section id="view-dashboard" class="space-y-6">
+      
+      <!-- Selector de Fecha -->
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 relative">
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
+          <span>Fecha de Sesión</span>
+          <span class="text-[10px] bg-brand-500/20 text-brand-accent px-2 py-0.5 rounded-full font-normal">Automática</span>
+        </label>
+        <div class="relative flex items-center bg-slate-950 border border-slate-800 rounded-xl p-3">
+          <i class="fa-regular fa-calendar text-brand-accent text-lg mr-3"></i>
+          <span id="date-display" class="font-medium text-slate-200 text-base">Cargando fecha...</span>
+          <input type="date" id="input-date" onchange="updateDateDisplay(this.value)" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer">
+        </div>
+      </div>
+
+      <!-- Selector de Rutina -->
+      <div>
+        <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Seleccionar Rutina</label>
+        <div class="grid grid-cols-2 gap-3" id="routine-selector">
+          <button type="button" onclick="selectRoutine('1A')" id="btn-1A" class="routine-btn p-4 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
+            <span class="text-lg font-bold text-white">Rutina 1A</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left">Búlgaras • Press • Declinadas • Curl N.</span>
+          </button>
+
+          <button type="button" onclick="selectRoutine('2A')" id="btn-2A" class="routine-btn p-4 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
+            <span class="text-lg font-bold text-white">Rutina 2A</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left">Goblet • Curl M. • Elevaciones • Diamante</span>
+          </button>
+
+          <button type="button" onclick="selectRoutine('1B')" id="btn-1B" class="routine-btn p-4 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
+            <span class="text-lg font-bold text-white">Rutina 1B</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left">Búlgaras • Arqueras • Press • Curl Alt.</span>
+          </button>
+
+          <button type="button" onclick="selectRoutine('2B')" id="btn-2B" class="routine-btn p-4 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
+            <span class="text-lg font-bold text-white">Rutina 2B</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left">Goblet • Ext. Tríceps • Normales • Curl Spider</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Botón Generar Rutina -->
+      <button onclick="generateWorkout()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-4 rounded-xl text-lg shadow-lg shadow-brand-500/10 flex items-center justify-center gap-2 transition active:scale-[0.98]">
+        <i class="fa-solid fa-play"></i>
+        <span>Generar Rutina</span>
+      </button>
+
+    </section>
+
+    <!-- VISTA SESIÓN: DESPLIEGUE -->
+    <section id="view-workout" class="hidden space-y-4">
+      
+      <!-- Resumen de Sesión -->
+      <div class="bg-slate-900 rounded-xl p-3 border border-slate-800 flex justify-between items-center">
+        <div>
+          <span id="workout-routine-title" class="text-lg font-black text-brand-accent">Rutina 1A</span>
+          <p id="workout-date-title" class="text-xs text-slate-400">01 de Enero</p>
+        </div>
+        <button onclick="showDashboard()" class="text-xs text-slate-400 hover:text-white bg-slate-800 px-3 py-1.5 rounded-lg">
+          Cambiar
+        </button>
+      </div>
+
+      <!-- Lista de Puestos -->
+      <div id="workout-list" class="space-y-4">
+        <!-- Renderizado dinámico de puestos -->
+      </div>
+
+      <!-- Finalizar Sesión -->
+      <button onclick="completeWorkout()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-4 rounded-xl text-base shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition active:scale-[0.98] mt-6">
+        <i class="fa-solid fa-circle-check text-lg"></i>
+        <span>MARCAR ENTRENAMIENTO COMPLETADO</span>
+      </button>
+
+    </section>
+
+    <!-- VISTA CONFIGURACIÓN: PROGRESIÓN -->
+    <section id="view-progression" class="hidden space-y-6">
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800">
+        <h2 class="text-lg font-bold text-white mb-1">Ajuste de Progresión</h2>
+        <p class="text-xs text-slate-400 mb-4">La app suma automáticamente +1 rep cada mes transcurrido. Puedes ajustar repeticiones manualmente o cambiar cargas aquí.</p>
+
+        <!-- Ajuste de Reps por Grupo -->
+        <div class="space-y-3">
+
+          <!-- Piernas -->
+          <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
+            <div>
+              <span class="text-sm font-semibold text-slate-200">Piernas (Búlgaras/Goblet)</span>
+              <p id="leg-reps-display" class="text-xs text-brand-accent">12 reps base (+0 bonus)</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="adjustManualReps('piernas', -1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">-</button>
+              <button onclick="adjustManualReps('piernas', 1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">+</button>
+            </div>
+          </div>
+
+          <!-- Bíceps -->
+          <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
+            <div>
+              <span class="text-sm font-semibold text-slate-200">Bíceps (Curls)</span>
+              <p id="biceps-reps-display" class="text-xs text-brand-accent">9 reps base (+0 bonus)</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="adjustManualReps('biceps', -1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">-</button>
+              <button onclick="adjustManualReps('biceps', 1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">+</button>
+            </div>
+          </div>
+
+          <!-- Hombro -->
+          <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
+            <div>
+              <span class="text-sm font-semibold text-slate-200">Hombro</span>
+              <p id="hombro-reps-display" class="text-xs text-brand-accent">9 reps base (+0 bonus)</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="adjustManualReps('hombro', -1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">-</button>
+              <button onclick="adjustManualReps('hombro', 1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">+</button>
+            </div>
+          </div>
+
+          <!-- Tríceps -->
+          <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
+            <div>
+              <span class="text-sm font-semibold text-slate-200">Tríceps</span>
+              <p id="triceps-reps-display" class="text-xs text-brand-accent">11 reps base (+0 bonus)</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="adjustManualReps('triceps', -1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">-</button>
+              <button onclick="adjustManualReps('triceps', 1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">+</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Cargas de Hombro -->
+        <div class="mt-6 border-t border-slate-800 pt-4 space-y-4">
+          <h3 class="text-sm font-bold text-white">Pesos Asignados a Hombro</h3>
+          
+          <!-- Press Militar -->
+          <div>
+            <label class="block text-xs text-slate-400 mb-2">Press Militar Unilateral</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setShoulderWeight('press', '20 kg')" id="weight-press-20" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">20 kg</button>
+              <button onclick="setShoulderWeight('press', '25 kg')" id="weight-press-25" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">25 kg</button>
+            </div>
+          </div>
+
+          <!-- Elevaciones Laterales -->
+          <div>
+            <label class="block text-xs text-slate-400 mb-2">Elevaciones Laterales Unilaterales</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="setShoulderWeight('elevaciones', '15 kg')" id="weight-elev-15" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">15 kg</button>
+              <button onclick="setShoulderWeight('elevaciones', '20 kg')" id="weight-elev-20" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">20 kg</button>
+              <button onclick="setShoulderWeight('elevaciones', '25 kg')" id="weight-elev-25" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">25 kg</button>
+            </div>
+          </div>
+
+        </div>
+
+        <button onclick="showDashboard()" class="w-full mt-6 bg-slate-800 hover:bg-slate-700 text-white font-bold py-3 rounded-xl text-sm border border-slate-700">
+          Guardar y Volver
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ESTADO DE LA APLICACIÓN
+    let selectedRoutine = '1A';
+    let selectedDate = new Date().toISOString().split('T')[0];
+
+    // Cargar o inicializar almacenamiento
+    let progState = JSON.parse(localStorage.getItem('prog_state')) || {
+      startDate: new Date().toISOString(),
+      manualBonus: { piernas: 0, biceps: 0, hombro: 0, triceps: 0 },
+      shoulderWeights: {
+        press: '20 kg',
+        elevaciones: '15 kg'
+      }
+    };
+
+    function saveState() {
+      localStorage.setItem('prog_state', JSON.stringify(progState));
+    }
+
+    // Inicialización al cargar la página
+    window.onload = function() {
+      setTodayDate();
+      selectRoutine('1A');
+      updateProgressionView();
+    };
+
+    function setTodayDate() {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      selectedDate = `${year}-${month}-${day}`;
+      
+      const dateInput = document.getElementById('input-date');
+      if (dateInput) dateInput.value = selectedDate;
+      updateDateDisplay(selectedDate);
+    }
+
+    function updateDateDisplay(dateString) {
+      selectedDate = dateString;
+      const [year, month, day] = dateString.split('-');
+      const dateObj = new Date(year, month - 1, day);
+      const options = { weekday: 'short', day: 'numeric', month: 'short' };
+      document.getElementById('date-display').innerText = dateObj.toLocaleDateString('es-ES', options);
+    }
+
+    function selectRoutine(routine) {
+      selectedRoutine = routine;
+      document.querySelectorAll('.routine-btn').forEach(btn => {
+        btn.classList.remove('border-brand-500', 'bg-brand-500/10');
+        btn.classList.add('border-slate-800', 'bg-slate-900');
+      });
+
+      const selectedBtn = document.getElementById(`btn-${routine}`);
+      if (selectedBtn) {
+        selectedBtn.classList.remove('border-slate-800', 'bg-slate-900');
+        selectedBtn.classList.add('border-brand-500', 'bg-brand-500/10');
+      }
+    }
+
+    // Cálculo de meses para auto-sobrecarga
+    function getMonthsElapsed() {
+      const start = new Date(progState.startDate);
+      const now = new Date();
+      let months = (now.getFullYear() - start.getFullYear()) * 12;
+      months -= start.getMonth();
+      months += now.getMonth();
+      return months <= 0 ? 0 : months;
+    }
+
+    function getTargetReps(group, baseReps) {
+      const autoBonus = getMonthsElapsed();
+      const manualBonus = progState.manualBonus[group] || 0;
+      return baseReps + autoBonus + manualBonus;
+    }
+
+    // GENERAR RUTINA SEGÚN SELECCIÓN
+    function generateWorkout() {
+      const legReps = getTargetReps('piernas', 12);
+      const bicepsReps = getTargetReps('biceps', 9);
+      const hombroReps = getTargetReps('hombro', 9);
+      const tricepsReps = getTargetReps('triceps', 11);
+
+      // Defs de Pierna alternada
+      const legBulgaras = {
+        name: "Sentadilla Búlgara en Muro",
+        load: "Mancuernas 25 kg + 20 kg",
+        desc: `3 series x ${legReps} reps + 1 serie Remate Goblet Profunda (25 kg) al fallo.`,
+        rest: "90s"
+      };
+
+      const legGoblet = {
+        name: "Sentadilla Goblet Profunda",
+        load: "Mancuerna 25 kg",
+        desc: `3 series x ${legReps} reps + 1 serie Remate Zancadas en Piso al fallo.`,
+        rest: "90s"
+      };
+
+      let workoutData = [];
+
+      if (selectedRoutine === '1A') {
+        // Orden: Piernas (Búlgaras) -> Hombro -> Pecho -> Bíceps -> Core
+        workoutData = [
+          { pos: "Puesto 1 (Piernas)", ...legBulgaras },
+          { pos: "Puesto 2 (Hombro)", name: "Press Militar Unilateral", load: progState.shoulderWeights.press, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Pecho)", name: "Flexiones Declinadas", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
+          { pos: "Puesto 4 (Bíceps)", name: "Curl Normal", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
+        ];
+      } else if (selectedRoutine === '2A') {
+        // Orden: Piernas (Goblet) -> Bíceps -> Hombro -> Pecho -> Core
+        workoutData = [
+          { pos: "Puesto 1 (Piernas)", ...legGoblet },
+          { pos: "Puesto 2 (Bíceps)", name: "Curl Martillo", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Hombro)", name: "Elevaciones Laterales Unilaterales", load: progState.shoulderWeights.elevaciones, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
+          { pos: "Puesto 4 (Pecho)", name: "Flexiones Diamante", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
+          { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
+        ];
+      } else if (selectedRoutine === '1B') {
+        // Orden: Piernas (Búlgaras) -> Pecho -> Hombro -> Bíceps -> Core
+        workoutData = [
+          { pos: "Puesto 1 (Piernas)", ...legBulgaras },
+          { pos: "Puesto 2 (Pecho)", name: "Flexiones Arqueras", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
+          { pos: "Puesto 3 (Hombro)", name: "Press Militar Unilateral", load: progState.shoulderWeights.press, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
+          { pos: "Puesto 4 (Bíceps)", name: "Curl Alternado", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
+        ];
+      } else if (selectedRoutine === '2B') {
+        // Orden: Piernas (Goblet) -> Tríceps -> Pecho -> Bíceps -> Core
+        workoutData = [
+          { pos: "Puesto 1 (Piernas)", ...legGoblet },
+          { pos: "Puesto 2 (Tríceps)", name: "Extensiones Tras Nuca a Dos Manos", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Pecho)", name: "Flexiones Plano Normal", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
+          { pos: "Puesto 4 (Bíceps)", name: "Curl Spider en Murete", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
+        ];
+      }
+
+      renderWorkoutView(workoutData);
+    }
+
+    function renderWorkoutView(data) {
+      document.getElementById('workout-routine-title').innerText = `Rutina ${selectedRoutine}`;
+      document.getElementById('workout-date-title').innerText = document.getElementById('date-display').innerText;
+
+      const container = document.getElementById('workout-list');
+      container.innerHTML = '';
+
+      data.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-2";
+        
+        card.innerHTML = `
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-brand-accent uppercase">${item.pos}</span>
+            <span class="text-[11px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700">
+              <i class="fa-regular fa-clock mr-1"></i>Descanso ${item.rest}
+            </span>
+          </div>
+          <h3 class="text-base font-bold text-white">${item.name}</h3>
+          <div class="text-xs text-slate-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-weight-hanging text-slate-500"></i>
+            <span>${item.load}</span>
+          </div>
+          <div class="text-xs text-slate-400 bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 mt-1">
+            <i class="fa-solid fa-bullseye text-brand-500 mr-1.5"></i>${item.desc}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('view-dashboard').classList.add('hidden');
+      document.getElementById('view-progression').classList.add('hidden');
+      document.getElementById('view-workout').classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }
+
+    function completeWorkout() {
+      alert(`¡Entrenamiento de Rutina ${selectedRoutine} completado exitosamente!`);
+      showDashboard();
+    }
+
+    function showDashboard() {
+      document.getElementById('view-workout').classList.add('hidden');
+      document.getElementById('view-progression').classList.add('hidden');
+      document.getElementById('view-dashboard').classList.remove('hidden');
+      document.getElementById('nav-btn').innerHTML = `<i class="fa-solid font-black fa-sliders"></i><span>Progresión</span>`;
+      window.scrollTo(0, 0);
+    }
+
+    function toggleView() {
+      const progView = document.getElementById('view-progression');
+      if (progView.classList.contains('hidden')) {
+        updateProgressionView();
+        document.getElementById('view-dashboard').classList.add('hidden');
+        document.getElementById('view-workout').classList.add('hidden');
+        progView.classList.remove('hidden');
+        document.getElementById('nav-btn').innerHTML = `<i class="fa-solid fa-house"></i><span>Inicio</span>`;
+      } else {
+        showDashboard();
+      }
+    }
+
+    function adjustManualReps(group, amount) {
+      progState.manualBonus[group] = (progState.manualBonus[group] || 0) + amount;
+      saveState();
+      updateProgressionView();
+    }
+
+    function setShoulderWeight(type, weight) {
+      progState.shoulderWeights[type] = weight;
+      saveState();
+      updateProgressionView();
+    }
+
+    function updateProgressionView() {
+      const legReps = getTargetReps('piernas', 12);
+      const bicepsReps = getTargetReps('biceps', 9);
+      const hombroReps = getTargetReps('hombro', 9);
+      const tricepsReps = getTargetReps('triceps', 11);
+
+      document.getElementById('leg-reps-display').innerText = `${legReps} reps objetivo (${progState.manualBonus.piernas >= 0 ? '+' : ''}${progState.manualBonus.piernas} manual)`;
+      document.getElementById('biceps-reps-display').innerText = `${bicepsReps} reps objetivo (${progState.manualBonus.biceps >= 0 ? '+' : ''}${progState.manualBonus.biceps} manual)`;
+      document.getElementById('hombro-reps-display').innerText = `${hombroReps} reps objetivo (${progState.manualBonus.hombro >= 0 ? '+' : ''}${progState.manualBonus.hombro} manual)`;
+      document.getElementById('triceps-reps-display').innerText = `${tricepsReps} reps objetivo (${progState.manualBonus.triceps >= 0 ? '+' : ''}${progState.manualBonus.triceps} manual)`;
+
+      // UI Pesos Hombro
+      ['20', '25'].forEach(w => {
+        const btn = document.getElementById(`weight-press-${w}`);
+        if (btn) {
+          if (progState.shoulderWeights.press === `${w} kg`) {
+            btn.className = "p-2 text-xs rounded-lg border border-brand-500 bg-brand-500/10 text-brand-accent font-bold";
+          } else {
+            btn.className = "p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold";
+          }
+        }
+      });
+
+      ['15', '20', '25'].forEach(w => {
+        const btn = document.getElementById(`weight-elev-${w}`);
+        if (btn) {
+          if (progState.shoulderWeights.elevaciones === `${w} kg`) {
+            btn.className = "p-2 text-xs rounded-lg border border-brand-500 bg-brand-500/10 text-brand-accent font-bold";
+          } else {
+            btn.className = "p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold";
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
