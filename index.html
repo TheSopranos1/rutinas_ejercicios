@@ -286,23 +286,12 @@
       localStorage.setItem('prog_state', JSON.stringify(progState));
     }
 
-    // Inicialización al cargar la página
+    // Inicialización al cargar la página (Única declaración)
     window.onload = function() {
       setTodayDate();
       selectRoutine('1');
       updateProgressionView();
       renderHistoryAndCycle();
-    };
-
-    function saveState() {
-      localStorage.setItem('prog_state', JSON.stringify(progState));
-    }
-
-    // Inicialización al cargar la página
-    window.onload = function() {
-      setTodayDate();
-      selectRoutine('1A');
-      updateProgressionView();
     };
 
     function setTodayDate() {
@@ -376,7 +365,6 @@
       }
     }
 
-    // RENDER HISTORIAL Y PROGRESO DE CICLO
     function renderHistoryAndCycle() {
       const historyList = document.getElementById('history-list');
       const cycleBadges = document.getElementById('cycle-badges');
@@ -444,14 +432,27 @@
       renderHistoryAndCycle();
     }
 
-    // GENERAR RUTINA SEGÚN SELECCIÓN
+    function getMonthsElapsed() {
+      const start = new Date(progState.startDate);
+      const now = new Date();
+      let months = (now.getFullYear() - start.getFullYear()) * 12;
+      months -= start.getMonth();
+      months += now.getMonth();
+      return months <= 0 ? 0 : months;
+    }
+
+    function getTargetReps(group, baseReps) {
+      const autoBonus = getMonthsElapsed();
+      const manualBonus = progState.manualBonus[group] || 0;
+      return baseReps + autoBonus + manualBonus;
+    }
+
     function generateWorkout() {
       const legReps = getTargetReps('piernas', 12);
       const bicepsReps = getTargetReps('biceps', 9);
       const hombroReps = getTargetReps('hombro', 9);
       const tricepsReps = getTargetReps('triceps', 11);
 
-      // Defs de Pierna alternada
       const legBulgaras = {
         name: "Sentadilla Búlgara en Muro",
         load: "Mancuernas 25 kg + 20 kg",
@@ -469,7 +470,6 @@
       let workoutData = [];
 
       if (selectedRoutine === '1') {
-        // Orden: Piernas (Búlgaras) -> Hombro -> Pecho -> Bíceps -> Core
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legBulgaras },
           { pos: "Puesto 2 (Hombro)", name: "Press Militar Unilateral", load: progState.shoulderWeights.press, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
@@ -478,7 +478,6 @@
           { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
         ];
       } else if (selectedRoutine === '2') {
-        // Orden: Piernas (Goblet) -> Bíceps -> Hombro -> Pecho -> Core
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legGoblet },
           { pos: "Puesto 2 (Bíceps)", name: "Curl Martillo", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
@@ -487,7 +486,6 @@
           { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
         ];
       } else if (selectedRoutine === '3') {
-        // Orden: Piernas (Búlgaras) -> Pecho -> Hombro -> Bíceps -> Core
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legBulgaras },
           { pos: "Puesto 2 (Pecho)", name: "Flexiones Arqueras", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
@@ -496,105 +494,6 @@
           { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
         ];
       } else if (selectedRoutine === '4') {
-        // Orden: Piernas (Goblet) -> Tríceps -> Pecho -> Bíceps -> Core
-        workoutData = [
-          { pos: "Puesto 1 (Piernas)", ...legGoblet },
-          { pos: "Puesto 2 (Tríceps)", name: "Extensiones Tras Nuca a Dos Manos", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
-          { pos: "Puesto 3 (Pecho)", name: "Flexiones Plano Normal", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 4 (Bíceps)", name: "Curl Spider en Murete", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
-          { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
-        ];
-      }
-
-      renderWorkoutView(workoutData);
-    }
-
-    function completeWorkout() {
-      // Registrar en el historial
-      const entry = {
-        id: Date.now(),
-        date: selectedDate,
-        routine: selectedRoutine
-      };
-      
-      progState.history.push(entry);
-      saveState();
-
-      alert(`¡Entrenamiento de Rutina ${selectedRoutine} completado y guardado en el historial!`);
-      showDashboard();
-      renderHistoryAndCycle();
-    }
-    }
-
-    // Cálculo de meses para auto-sobrecarga
-    function getMonthsElapsed() {
-      const start = new Date(progState.startDate);
-      const now = new Date();
-      let months = (now.getFullYear() - start.getFullYear()) * 12;
-      months -= start.getMonth();
-      months += now.getMonth();
-      return months <= 0 ? 0 : months;
-    }
-
-    function getTargetReps(group, baseReps) {
-      const autoBonus = getMonthsElapsed();
-      const manualBonus = progState.manualBonus[group] || 0;
-      return baseReps + autoBonus + manualBonus;
-    }
-
-    // GENERAR RUTINA SEGÚN SELECCIÓN
-    function generateWorkout() {
-      const legReps = getTargetReps('piernas', 12);
-      const bicepsReps = getTargetReps('biceps', 9);
-      const hombroReps = getTargetReps('hombro', 9);
-      const tricepsReps = getTargetReps('triceps', 11);
-
-      // Defs de Pierna alternada
-      const legBulgaras = {
-        name: "Sentadilla Búlgara en Muro",
-        load: "Mancuernas 25 kg + 20 kg",
-        desc: `3 series x ${legReps} reps + 1 serie Remate Goblet Profunda (25 kg) al fallo.`,
-        rest: "90s"
-      };
-
-      const legGoblet = {
-        name: "Sentadilla Goblet Profunda",
-        load: "Mancuerna 25 kg",
-        desc: `3 series x ${legReps} reps + 1 serie Remate Zancadas en Piso al fallo.`,
-        rest: "90s"
-      };
-
-      let workoutData = [];
-
-      if (selectedRoutine === '1A') {
-        // Orden: Piernas (Búlgaras) -> Hombro -> Pecho -> Bíceps -> Core
-        workoutData = [
-          { pos: "Puesto 1 (Piernas)", ...legBulgaras },
-          { pos: "Puesto 2 (Hombro)", name: "Press Militar Unilateral", load: progState.shoulderWeights.press, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
-          { pos: "Puesto 3 (Pecho)", name: "Flexiones Declinadas", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 4 (Bíceps)", name: "Curl Normal", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
-          { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
-        ];
-      } else if (selectedRoutine === '2A') {
-        // Orden: Piernas (Goblet) -> Bíceps -> Hombro -> Pecho -> Core
-        workoutData = [
-          { pos: "Puesto 1 (Piernas)", ...legGoblet },
-          { pos: "Puesto 2 (Bíceps)", name: "Curl Martillo", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
-          { pos: "Puesto 3 (Hombro)", name: "Elevaciones Laterales Unilaterales", load: progState.shoulderWeights.elevaciones, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
-          { pos: "Puesto 4 (Pecho)", name: "Flexiones Diamante", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
-        ];
-      } else if (selectedRoutine === '1B') {
-        // Orden: Piernas (Búlgaras) -> Pecho -> Hombro -> Bíceps -> Core
-        workoutData = [
-          { pos: "Puesto 1 (Piernas)", ...legBulgaras },
-          { pos: "Puesto 2 (Pecho)", name: "Flexiones Arqueras", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 3 (Hombro)", name: "Press Militar Unilateral", load: progState.shoulderWeights.press, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
-          { pos: "Puesto 4 (Bíceps)", name: "Curl Alternado", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
-          { pos: "Puesto 5 (Core)", name: "Rueda Abdominal con Frenado en Murete", load: "Peso corporal", desc: "4 series al fallo absoluto", rest: "60s" }
-        ];
-      } else if (selectedRoutine === '2B') {
-        // Orden: Piernas (Goblet) -> Tríceps -> Pecho -> Bíceps -> Core
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legGoblet },
           { pos: "Puesto 2 (Tríceps)", name: "Extensiones Tras Nuca a Dos Manos", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
@@ -644,8 +543,17 @@
     }
 
     function completeWorkout() {
-      alert(`¡Entrenamiento de Rutina ${selectedRoutine} completado exitosamente!`);
+      const entry = {
+        id: Date.now(),
+        date: selectedDate,
+        routine: selectedRoutine
+      };
+      
+      progState.history.push(entry);
+      saveState();
+
       showDashboard();
+      renderHistoryAndCycle();
     }
 
     function showDashboard() {
@@ -692,7 +600,6 @@
       document.getElementById('hombro-reps-display').innerText = `${hombroReps} reps objetivo (${progState.manualBonus.hombro >= 0 ? '+' : ''}${progState.manualBonus.hombro} manual)`;
       document.getElementById('triceps-reps-display').innerText = `${tricepsReps} reps objetivo (${progState.manualBonus.triceps >= 0 ? '+' : ''}${progState.manualBonus.triceps} manual)`;
 
-      // UI Pesos Hombro
       ['20', '25'].forEach(w => {
         const btn = document.getElementById(`weight-press-${w}`);
         if (btn) {
