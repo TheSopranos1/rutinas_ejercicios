@@ -102,7 +102,7 @@
 
           <button type="button" onclick="selectRoutine('3')" id="btn-3" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 3</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Goblet • Elevaciones • Curl 2M • Arqueras • Rueda</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Goblet • Elevaciones • Curl Bilateral • Arqueras • Rueda</span>
           </button>
 
           <button type="button" onclick="selectRoutine('4')" id="btn-4" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
@@ -475,14 +475,14 @@
       const tricepsReps = getTargetReps('triceps', 11);
 
       const legGoblet = {
-        name: "Sentadilla Goblet (2 Mancuernas: Hombro + Central)",
+        name: "Sentadilla Goblet",
         load: "2 Mancuernas",
         desc: `4 series x ${legReps} reps`,
         rest: "90s"
       };
 
       const legSumo = {
-        name: "Sentadilla Sumo (2 Mancuernas: Hombro + Central)",
+        name: "Sentadilla Sumo",
         load: "2 Mancuernas",
         desc: `4 series x ${legReps} reps`,
         rest: "90s"
@@ -490,7 +490,7 @@
 
       const coreRueda = {
         pos: "Puesto 5 (Core)",
-        name: "Rueda Abdominal con Frenado en Murete",
+        name: "Rueda Abdominal",
         load: "Peso corporal",
         desc: "4 series al fallo absoluto",
         rest: "60s"
@@ -498,9 +498,9 @@
 
       const coreEscaladores = {
         pos: "Puesto 5 (Core)",
-        name: "Escaladores en Suelo (Alta Intensidad)",
+        name: "Escaladores",
         load: "Peso corporal",
-        desc: "4 series x 45 segundos a ritmo rápido e intenso",
+        desc: "4 series x 45 segundos a ritmo rápido",
         rest: "60s"
       };
 
@@ -510,32 +510,32 @@
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legGoblet },
           { pos: "Puesto 2 (Pecho)", name: "Flexiones Declinadas", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 3 (Hombro)", name: "Press Militar Unilateral", load: progState.shoulderWeights.press, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
-          { pos: "Puesto 4 (Bíceps)", name: "Curl Normal", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Hombro)", name: "Press Militar Unilateral", load: `Mancuerna ${progState.shoulderWeights.press}`, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
+          { pos: "Puesto 4 (Bíceps)", name: "Curl Normal Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           coreRueda
         ];
       } else if (selectedRoutine === '2') {
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legSumo },
-          { pos: "Puesto 2 (Bíceps)", name: "Curl Martillo", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 2 (Bíceps)", name: "Curl Martillo Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           { pos: "Puesto 3 (Pecho)", name: "Flexiones Diamante", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 4 (Tríceps)", name: "Extensiones Tras Nuca a Dos Manos", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 4 (Tríceps)", name: "Extensiones Tras Nuca Bilateral", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
           coreEscaladores
         ];
       } else if (selectedRoutine === '3') {
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legGoblet },
-          { pos: "Puesto 2 (Hombro)", name: "Elevaciones Laterales Unilaterales", load: progState.shoulderWeights.elevaciones, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
-          { pos: "Puesto 3 (Bíceps)", name: "Curl Normal (2 Mancuernas)", load: "2 Mancuernas (Bilateral)", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 2 (Hombro)", name: "Elevaciones Laterales Unilateral", load: `Mancuerna ${progState.shoulderWeights.elevaciones}`, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Bíceps)", name: "Curl Normal Bilateral", load: "2 Mancuernas", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           { pos: "Puesto 4 (Pecho)", name: "Flexiones Arqueras", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
           coreRueda
         ];
       } else if (selectedRoutine === '4') {
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legSumo },
-          { pos: "Puesto 2 (Pecho)", name: "Flexiones Plano Normal", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 3 (Tríceps)", name: "Fondos en Muro / Banco", load: "Peso corporal", desc: `4 series x 15 reps (o al fallo)`, rest: "60s" },
-          { pos: "Puesto 4 (Bíceps)", name: "Curl Concentrado", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 2 (Pecho)", name: "Flexiones Normales", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
+          { pos: "Puesto 3 (Tríceps)", name: "Fondos", load: "Peso corporal", desc: `4 series x 15 reps (o al fallo)`, rest: "60s" },
+          { pos: "Puesto 4 (Bíceps)", name: "Curl Concentrado Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           coreEscaladores
         ];
       }
