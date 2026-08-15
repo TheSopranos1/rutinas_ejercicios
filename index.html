@@ -102,12 +102,12 @@
 
           <button type="button" onclick="selectRoutine('3')" id="btn-3" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 3</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Goblet • Elevaciones • Curl Alt. • Arqueras • Rueda</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Goblet • Elevaciones • Curl 2M • Arqueras • Rueda</span>
           </button>
 
           <button type="button" onclick="selectRoutine('4')" id="btn-4" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 4</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Sumo • Normales • Fondos Muro • Spider • Escaladores</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Sumo • Normales • Fondos Muro • Concentrado • Escaladores</span>
           </button>
         </div>
       </div>
@@ -184,7 +184,7 @@
           <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
             <div>
               <span class="text-sm font-semibold text-slate-200">Piernas (Goblet/Sumo)</span>
-              <p id="leg-reps-display" class="text-xs text-brand-accent">15 reps base (+0 bonus)</p>
+              <p id="leg-reps-display" class="text-xs text-brand-accent">10 reps base (+0 bonus)</p>
             </div>
             <div class="flex items-center gap-2">
               <button onclick="adjustManualReps('piernas', -1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">-</button>
@@ -469,21 +469,21 @@
     }
 
     function generateWorkout() {
-      const legReps = getTargetReps('piernas', 15);
+      const legReps = getTargetReps('piernas', 10);
       const bicepsReps = getTargetReps('biceps', 9);
       const hombroReps = getTargetReps('hombro', 9);
       const tricepsReps = getTargetReps('triceps', 11);
 
       const legGoblet = {
-        name: "Sentadilla Goblet Profunda",
-        load: "Mancuerna 25 kg",
+        name: "Sentadilla Goblet (2 Mancuernas: Hombro + Central)",
+        load: "2 Mancuernas",
         desc: `4 series x ${legReps} reps`,
         rest: "90s"
       };
 
       const legSumo = {
-        name: "Sentadilla Sumo Profunda",
-        load: "Mancuerna 25 kg",
+        name: "Sentadilla Sumo (2 Mancuernas: Hombro + Central)",
+        load: "2 Mancuernas",
         desc: `4 series x ${legReps} reps`,
         rest: "90s"
       };
@@ -498,9 +498,9 @@
 
       const coreEscaladores = {
         pos: "Puesto 5 (Core)",
-        name: "Escaladores (Mountain Climbers)",
+        name: "Escaladores en Suelo (Alta Intensidad)",
         load: "Peso corporal",
-        desc: "4 series x 45 segundos ritmo controlled",
+        desc: "4 series x 45 segundos a ritmo rápido e intenso",
         rest: "60s"
       };
 
@@ -526,7 +526,7 @@
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legGoblet },
           { pos: "Puesto 2 (Hombro)", name: "Elevaciones Laterales Unilaterales", load: progState.shoulderWeights.elevaciones, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
-          { pos: "Puesto 3 (Bíceps)", name: "Curl Alternado", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Bíceps)", name: "Curl Normal (2 Mancuernas)", load: "2 Mancuernas (Bilateral)", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           { pos: "Puesto 4 (Pecho)", name: "Flexiones Arqueras", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
           coreRueda
         ];
@@ -535,7 +535,7 @@
           { pos: "Puesto 1 (Piernas)", ...legSumo },
           { pos: "Puesto 2 (Pecho)", name: "Flexiones Plano Normal", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
           { pos: "Puesto 3 (Tríceps)", name: "Fondos en Muro / Banco", load: "Peso corporal", desc: `4 series x 15 reps (o al fallo)`, rest: "60s" },
-          { pos: "Puesto 4 (Bíceps)", name: "Curl Spider en Murete", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 4 (Bíceps)", name: "Curl Concentrado", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           coreEscaladores
         ];
       }
@@ -627,7 +627,7 @@
     }
 
     function updateProgressionView() {
-      const legReps = getTargetReps('piernas', 15);
+      const legReps = getTargetReps('piernas', 10);
       const bicepsReps = getTargetReps('biceps', 9);
       const hombroReps = getTargetReps('hombro', 9);
       const tricepsReps = getTargetReps('triceps', 11);
