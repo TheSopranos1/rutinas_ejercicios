@@ -97,7 +97,7 @@
 
           <button type="button" onclick="selectRoutine('2')" id="btn-2" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 2</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Sumo • Martillo • Diamante • Ext. Tríceps • Escaladores</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Step-Ups • Martillo • Diamante • Copa Tríceps • Rueda</span>
           </button>
 
           <button type="button" onclick="selectRoutine('3')" id="btn-3" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
@@ -107,7 +107,7 @@
 
           <button type="button" onclick="selectRoutine('4')" id="btn-4" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 4</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Sumo • Normales • Fondos Muro • Concentrado • Escaladores</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Step-Ups • Normales • Patada Tríceps • Concentrado • Rueda</span>
           </button>
         </div>
       </div>
@@ -183,7 +183,7 @@
           <!-- Piernas -->
           <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
             <div>
-              <span class="text-sm font-semibold text-slate-200">Piernas (Goblet/Sumo)</span>
+              <span class="text-sm font-semibold text-slate-200">Piernas (Goblet/Step-Ups)</span>
               <p id="leg-reps-display" class="text-xs text-brand-accent">10 reps base (+0 bonus)</p>
             </div>
             <div class="flex items-center gap-2">
@@ -348,7 +348,7 @@
       return allRoutines.filter(r => !doneInCycle.includes(r));
     }
 
-    // Selección aleatoria inteligente que evita repetir ejercicios el día siguiente
+    // Selección aleatoria inteligente que evita repetir ejercicios de pierna el día siguiente
     function selectRandomRoutine() {
       const available = getRemainingRoutinesInCycle();
       const history = progState.history || [];
@@ -360,14 +360,14 @@
 
       let candidates = [...available];
 
-      // Filtro anti-repetición consecutiva de ejercicios
+      // Filtro anti-repetición consecutiva de ejercicios de pierna
       if (lastRoutine) {
-        // Si el último día fue Rutina 1 o 3 (Goblet Squat + Hombro + Rueda)
+        // Si el último día fue Rutina 1 o 3 (Sentadilla Goblet)
         if (lastRoutine === '1' || lastRoutine === '3') {
           const filtered = candidates.filter(r => r === '2' || r === '4');
           if (filtered.length > 0) candidates = filtered;
         } 
-        // Si el último día fue Rutina 2 o 4 (Sumo Squat + Tríceps + Escaladores)
+        // Si el último día fue Rutina 2 o 4 (Sentadilla Step-Ups)
         else if (lastRoutine === '2' || lastRoutine === '4') {
           const filtered = candidates.filter(r => r === '1' || r === '3');
           if (filtered.length > 0) candidates = filtered;
@@ -481,10 +481,10 @@
         rest: "90s"
       };
 
-      const legSumo = {
-        name: "Sentadilla Sumo",
+      const legStepUps = {
+        name: "Sentadilla Step-Ups",
         load: "2 Mancuernas",
-        desc: `4 series x ${legReps} reps`,
+        desc: `4 series x ${legReps} reps (por pierna)`,
         rest: "90s"
       };
 
@@ -493,14 +493,6 @@
         name: "Rueda Abdominal",
         load: "Peso corporal",
         desc: "4 series al fallo absoluto",
-        rest: "60s"
-      };
-
-      const coreEscaladores = {
-        pos: "Puesto 5 (Core)",
-        name: "Escaladores",
-        load: "Peso corporal",
-        desc: "4 series x 45 segundos a ritmo rápido",
         rest: "60s"
       };
 
@@ -516,11 +508,11 @@
         ];
       } else if (selectedRoutine === '2') {
         workoutData = [
-          { pos: "Puesto 1 (Piernas)", ...legSumo },
+          { pos: "Puesto 1 (Piernas)", ...legStepUps },
           { pos: "Puesto 2 (Bíceps)", name: "Curl Martillo Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           { pos: "Puesto 3 (Pecho)", name: "Flexiones Diamante", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 4 (Tríceps)", name: "Extensiones Tras Nuca Bilateral", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
-          coreEscaladores
+          { pos: "Puesto 4 (Tríceps)", name: "Copa Tríceps Bilateral", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
+          coreRueda
         ];
       } else if (selectedRoutine === '3') {
         workoutData = [
@@ -532,11 +524,11 @@
         ];
       } else if (selectedRoutine === '4') {
         workoutData = [
-          { pos: "Puesto 1 (Piernas)", ...legSumo },
+          { pos: "Puesto 1 (Piernas)", ...legStepUps },
           { pos: "Puesto 2 (Pecho)", name: "Flexiones Normales", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 3 (Tríceps)", name: "Fondos", load: "Peso corporal", desc: `4 series x 15 reps (o al fallo)`, rest: "60s" },
+          { pos: "Puesto 3 (Tríceps)", name: "Patada de Tríceps Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
           { pos: "Puesto 4 (Bíceps)", name: "Curl Concentrado Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
-          coreEscaladores
+          coreRueda
         ];
       }
 
