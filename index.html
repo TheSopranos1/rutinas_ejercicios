@@ -97,17 +97,17 @@
 
           <button type="button" onclick="selectRoutine('2')" id="btn-2" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 2</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Step-Ups • Martillo • Diamante • Copa Tríceps • Rueda</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left">Step-Ups • Martillo • Diamante • Copa Tríceps • Rueda</span>
           </button>
 
           <button type="button" onclick="selectRoutine('3')" id="btn-3" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 3</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Goblet • Elevaciones • Curl Bilateral • Arqueras • Rueda</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left">Goblet • Elevaciones • Curl Bilateral • Apertura • Rueda</span>
           </button>
 
           <button type="button" onclick="selectRoutine('4')" id="btn-4" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 4</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Step-Ups • Normales • Patada Tríceps • Concentrado • Rueda</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left">Step-Ups • Normales • Patada Tríceps • Concentrado • Rueda</span>
           </button>
         </div>
       </div>
@@ -175,7 +175,7 @@
     <section id="view-progression" class="hidden space-y-6">
       <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800">
         <h2 class="text-lg font-bold text-white mb-1">Ajuste de Progresión</h2>
-        <p class="text-xs text-slate-400 mb-4">La app suma automáticamente +1 rep cada mes transcurrido. Puedes ajustar repeticiones manualmente o cambiar cargas de hombro aquí.</p>
+        <p class="text-xs text-slate-400 mb-4">La app suma automáticamente +1 rep cada mes transcurrido. Puedes ajustar repeticiones manualmente o cambiar cargas aquí.</p>
 
         <!-- Ajuste de Reps por Grupo -->
         <div class="space-y-3">
@@ -230,9 +230,9 @@
 
         </div>
 
-        <!-- Cargas de Hombro -->
+        <!-- Cargas Seleccionables -->
         <div class="mt-6 border-t border-slate-800 pt-4 space-y-4">
-          <h3 class="text-sm font-bold text-white">Pesos Asignados a Hombro</h3>
+          <h3 class="text-sm font-bold text-white">Pesos Asignados a Hombro y Tríceps</h3>
           
           <!-- Press Militar -->
           <div>
@@ -245,11 +245,21 @@
 
           <!-- Elevaciones Laterales -->
           <div>
-            <label class="block text-xs text-slate-400 mb-2">Elevaciones Laterales Unilaterales</label>
+            <label class="block text-xs text-slate-400 mb-2">Elevaciones Laterales Unilateral</label>
             <div class="grid grid-cols-3 gap-2">
               <button onclick="setShoulderWeight('elevaciones', '15 kg')" id="weight-elev-15" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">15 kg</button>
               <button onclick="setShoulderWeight('elevaciones', '20 kg')" id="weight-elev-20" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">20 kg</button>
               <button onclick="setShoulderWeight('elevaciones', '25 kg')" id="weight-elev-25" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">25 kg</button>
+            </div>
+          </div>
+
+          <!-- Patada de Tríceps Unilateral -->
+          <div>
+            <label class="block text-xs text-slate-400 mb-2">Patada de Tríceps Unilateral</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="setTricepsWeight('patada', '15 kg')" id="weight-patada-15" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">15 kg</button>
+              <button onclick="setTricepsWeight('patada', '20 kg')" id="weight-patada-20" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">20 kg</button>
+              <button onclick="setTricepsWeight('patada', '25 kg')" id="weight-patada-25" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">25 kg</button>
             </div>
           </div>
 
@@ -276,10 +286,15 @@
         press: '20 kg',
         elevaciones: '15 kg'
       },
+      tricepsWeights: {
+        patada: '15 kg'
+      },
       history: []
     };
 
     if (!progState.history) progState.history = [];
+    if (!progState.shoulderWeights) progState.shoulderWeights = { press: '20 kg', elevaciones: '15 kg' };
+    if (!progState.tricepsWeights) progState.tricepsWeights = { patada: '15 kg' };
 
     function saveState() {
       localStorage.setItem('prog_state', JSON.stringify(progState));
@@ -348,7 +363,6 @@
       return allRoutines.filter(r => !doneInCycle.includes(r));
     }
 
-    // Selección aleatoria inteligente que evita repetir ejercicios de pierna el día siguiente
     function selectRandomRoutine() {
       const available = getRemainingRoutinesInCycle();
       const history = progState.history || [];
@@ -519,14 +533,14 @@
           { pos: "Puesto 1 (Piernas)", ...legGoblet },
           { pos: "Puesto 2 (Hombro)", name: "Elevaciones Laterales Unilateral", load: `Mancuerna ${progState.shoulderWeights.elevaciones}`, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
           { pos: "Puesto 3 (Bíceps)", name: "Curl Normal Bilateral", load: "2 Mancuernas", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
-          { pos: "Puesto 4 (Pecho)", name: "Flexiones Arqueras", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
+          { pos: "Puesto 4 (Pecho)", name: "Flexiones en Apertura", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
           coreRueda
         ];
       } else if (selectedRoutine === '4') {
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legStepUps },
           { pos: "Puesto 2 (Pecho)", name: "Flexiones Normales", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 3 (Tríceps)", name: "Patada de Tríceps Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Tríceps)", name: "Patada de Tríceps Unilateral", load: `Mancuerna ${progState.tricepsWeights.patada}`, desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
           { pos: "Puesto 4 (Bíceps)", name: "Curl Concentrado Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           coreRueda
         ];
@@ -618,6 +632,12 @@
       updateProgressionView();
     }
 
+    function setTricepsWeight(type, weight) {
+      progState.tricepsWeights[type] = weight;
+      saveState();
+      updateProgressionView();
+    }
+
     function updateProgressionView() {
       const legReps = getTargetReps('piernas', 10);
       const bicepsReps = getTargetReps('biceps', 9);
@@ -644,6 +664,17 @@
         const btn = document.getElementById(`weight-elev-${w}`);
         if (btn) {
           if (progState.shoulderWeights.elevaciones === `${w} kg`) {
+            btn.className = "p-2 text-xs rounded-lg border border-brand-500 bg-brand-500/10 text-brand-accent font-bold";
+          } else {
+            btn.className = "p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold";
+          }
+        }
+      });
+
+      ['15', '20', '25'].forEach(w => {
+        const btn = document.getElementById(`weight-patada-${w}`);
+        if (btn) {
+          if (progState.tricepsWeights.patada === `${w} kg`) {
             btn.className = "p-2 text-xs rounded-lg border border-brand-500 bg-brand-500/10 text-brand-accent font-bold";
           } else {
             btn.className = "p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-400 font-bold";
