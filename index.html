@@ -92,7 +92,7 @@
         <div class="grid grid-cols-2 gap-3" id="routine-selector">
           <button type="button" onclick="selectRoutine('1')" id="btn-1" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 1</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Goblet • Declinadas • Press • Curl N. • Rueda</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left leading-tight">Goblet • Declinadas • Press • Curl Normal • Rueda</span>
           </button>
 
           <button type="button" onclick="selectRoutine('2')" id="btn-2" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
@@ -102,7 +102,7 @@
 
           <button type="button" onclick="selectRoutine('3')" id="btn-3" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
             <span class="text-base font-bold text-white">Rutina 3</span>
-            <span class="text-[11px] text-slate-400 mt-1 text-left">Goblet • Elevaciones • Curl Bilateral • Apertura • Rueda</span>
+            <span class="text-[11px] text-slate-400 mt-1 text-left">Goblet • Elevaciones • Curl Alt. • Apertura • Rueda</span>
           </button>
 
           <button type="button" onclick="selectRoutine('4')" id="btn-4" class="routine-btn p-3.5 rounded-xl border border-slate-800 bg-slate-900 flex flex-col items-start transition">
@@ -184,7 +184,7 @@
           <div class="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
             <div>
               <span class="text-sm font-semibold text-slate-200">Piernas (Goblet/Step-Ups)</span>
-              <p id="leg-reps-display" class="text-xs text-brand-accent">10 reps base (+0 bonus)</p>
+              <p id="leg-reps-display" class="text-xs text-brand-accent">12 reps base (+0 bonus)</p>
             </div>
             <div class="flex items-center gap-2">
               <button onclick="adjustManualReps('piernas', -1)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 flex items-center justify-center font-bold text-lg active:bg-slate-700">-</button>
@@ -245,11 +245,11 @@
 
           <!-- Elevaciones Laterales -->
           <div>
-            <label class="block text-xs text-slate-400 mb-2">Elevaciones Laterales Unilateral</label>
+            <label class="block text-xs text-slate-400 mb-2">Elevaciones Laterales</label>
             <div class="grid grid-cols-3 gap-2">
+              <button onclick="setShoulderWeight('elevaciones', '10 kg')" id="weight-elev-10" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">10 kg</button>
               <button onclick="setShoulderWeight('elevaciones', '15 kg')" id="weight-elev-15" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">15 kg</button>
               <button onclick="setShoulderWeight('elevaciones', '20 kg')" id="weight-elev-20" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">20 kg</button>
-              <button onclick="setShoulderWeight('elevaciones', '25 kg')" id="weight-elev-25" class="p-2 text-xs rounded-lg border border-slate-800 bg-slate-950 text-slate-300 font-bold">25 kg</button>
             </div>
           </div>
 
@@ -284,7 +284,7 @@
       manualBonus: { piernas: 0, biceps: 0, hombro: 0, triceps: 0 },
       shoulderWeights: {
         press: '20 kg',
-        elevaciones: '15 kg'
+        elevaciones: '10 kg'
       },
       tricepsWeights: {
         patada: '15 kg'
@@ -293,7 +293,7 @@
     };
 
     if (!progState.history) progState.history = [];
-    if (!progState.shoulderWeights) progState.shoulderWeights = { press: '20 kg', elevaciones: '15 kg' };
+    if (!progState.shoulderWeights) progState.shoulderWeights = { press: '20 kg', elevaciones: '10 kg' };
     if (!progState.tricepsWeights) progState.tricepsWeights = { patada: '15 kg' };
 
     function saveState() {
@@ -483,7 +483,7 @@
     }
 
     function generateWorkout() {
-      const legReps = getTargetReps('piernas', 10);
+      const legReps = getTargetReps('piernas', 12);
       const bicepsReps = getTargetReps('biceps', 9);
       const hombroReps = getTargetReps('hombro', 9);
       const tricepsReps = getTargetReps('triceps', 11);
@@ -498,7 +498,7 @@
       const legStepUps = {
         name: "Sentadilla Step-Ups",
         load: "2 Mancuernas",
-        desc: `4 series x ${legReps} reps (por pierna)`,
+        desc: `4 series x ${legReps} reps`,
         rest: "90s"
       };
 
@@ -516,23 +516,23 @@
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legGoblet },
           { pos: "Puesto 2 (Pecho)", name: "Flexiones Declinadas", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 3 (Hombro)", name: "Press Militar Unilateral", load: `Mancuerna ${progState.shoulderWeights.press}`, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
-          { pos: "Puesto 4 (Bíceps)", name: "Curl Normal Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Hombro)", name: "Press Militar", load: `Mancuerna ${progState.shoulderWeights.press}`, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
+          { pos: "Puesto 4 (Bíceps)", name: "Curl Normal", load: "2 Mancuernas", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           coreRueda
         ];
       } else if (selectedRoutine === '2') {
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legStepUps },
-          { pos: "Puesto 2 (Bíceps)", name: "Curl Martillo Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 2 (Bíceps)", name: "Curl Martillo", load: "2 Mancuernas", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           { pos: "Puesto 3 (Pecho)", name: "Flexiones Diamante", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 4 (Tríceps)", name: "Copa Tríceps Bilateral", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 4 (Tríceps)", name: "Copa Tríceps", load: "Mancuerna 25 kg", desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
           coreRueda
         ];
       } else if (selectedRoutine === '3') {
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legGoblet },
-          { pos: "Puesto 2 (Hombro)", name: "Elevaciones Laterales Unilateral", load: `Mancuerna ${progState.shoulderWeights.elevaciones}`, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
-          { pos: "Puesto 3 (Bíceps)", name: "Curl Normal Bilateral", load: "2 Mancuernas", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 2 (Hombro)", name: "Elevaciones Laterales", load: `Mancuerna ${progState.shoulderWeights.elevaciones}`, desc: `4 series x ${hombroReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Bíceps)", name: "Curl Alternado", load: "2 Mancuernas", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           { pos: "Puesto 4 (Pecho)", name: "Flexiones en Apertura", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
           coreRueda
         ];
@@ -540,8 +540,8 @@
         workoutData = [
           { pos: "Puesto 1 (Piernas)", ...legStepUps },
           { pos: "Puesto 2 (Pecho)", name: "Flexiones Normales", load: "Peso corporal", desc: "4 series x 12 reps", rest: "60s" },
-          { pos: "Puesto 3 (Tríceps)", name: "Patada de Tríceps Unilateral", load: `Mancuerna ${progState.tricepsWeights.patada}`, desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
-          { pos: "Puesto 4 (Bíceps)", name: "Curl Concentrado Unilateral", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 3 (Tríceps)", name: "Patada de Tríceps", load: `Mancuerna ${progState.tricepsWeights.patada}`, desc: `4 series x ${tricepsReps} reps`, rest: "60s" },
+          { pos: "Puesto 4 (Bíceps)", name: "Curl Concentrado", load: "Mancuerna 25 kg", desc: `4 series x ${bicepsReps} reps`, rest: "60s" },
           coreRueda
         ];
       }
@@ -639,7 +639,7 @@
     }
 
     function updateProgressionView() {
-      const legReps = getTargetReps('piernas', 10);
+      const legReps = getTargetReps('piernas', 12);
       const bicepsReps = getTargetReps('biceps', 9);
       const hombroReps = getTargetReps('hombro', 9);
       const tricepsReps = getTargetReps('triceps', 11);
@@ -660,7 +660,7 @@
         }
       });
 
-      ['15', '20', '25'].forEach(w => {
+      ['10', '15', '20'].forEach(w => {
         const btn = document.getElementById(`weight-elev-${w}`);
         if (btn) {
           if (progState.shoulderWeights.elevaciones === `${w} kg`) {
