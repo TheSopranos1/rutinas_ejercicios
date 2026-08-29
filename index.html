@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>MiRutina</title>
+  <title>Rutinas</title>
   <!-- Favicon Emoji -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💪🏽</text></svg>">
   <!-- Tailwind CSS CDN -->
@@ -54,7 +54,7 @@
       <div class="flex items-center space-x-2">
         <div class="bg-brand-500 text-slate-950 p-2 rounded-lg font-black text-xl">💪🏽</div>
         <div>
-          <h1 class="text-lg font-bold tracking-tight text-white leading-none">MiRutina</h1>
+          <h1 class="text-lg font-bold tracking-tight text-white leading-none">Rutinas</h1>
         </div>
       </div>
       <button onclick="toggleView()" id="nav-btn" class="text-xs bg-slate-800 hover:bg-slate-700 text-brand-accent px-3.5 py-2 rounded-lg border border-slate-700 font-bold transition flex items-center gap-2">
@@ -160,6 +160,16 @@
             </div>
           </div>
 
+          <!-- Patada Tríceps -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2">Patada Tríceps</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="setWeight('patada', '15 kg')" id="w-patada-15" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">15 kg</button>
+              <button onclick="setWeight('patada', '20 kg')" id="w-patada-20" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">20 kg</button>
+              <button onclick="setWeight('patada', '25 kg')" id="w-patada-25" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">25 kg</button>
+            </div>
+          </div>
+
         </div>
 
         <button onclick="showDashboard()" class="w-full mt-6 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3.5 rounded-xl text-sm transition">
@@ -178,7 +188,8 @@
     let progState = JSON.parse(localStorage.getItem('fullbody_state')) || {
       weights: {
         press: '20 kg',
-        elevaciones: '10 kg'
+        elevaciones: '10 kg',
+        patada: '15 kg'
       },
       history: [],
       lastStartLeg: '',
@@ -192,7 +203,7 @@
     // BASE DE DATOS DE EJERCICIOS CON LINKS DE YOUTUBE
     const EXERCISE_DATABASE = {
       legs: [
-        { name: "Sentadilla Frontal", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/RC5XZ3Bto0k" },
+        { name: "Sentadilla Frontal", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/BCGKtZ0fCiI" },
         { name: "Sentadilla Frontal Elevada", load: "2 Mancuernas", url: "https://www.youtube.com/watch?v=2ynGW-Kb8Hc" },
         { name: "Sentadilla Sumo", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/PYOWcPYckvg" }
       ],
@@ -209,7 +220,7 @@
       shouldersTriceps: [
         { name: "Press Militar", getLoad: () => `Mancuerna ${progState.weights.press || '20 kg'}`, url: "https://www.youtube.com/shorts/i5cvgQveFbY" },
         { name: "Elevaciones Laterales", getLoad: () => `Mancuerna ${progState.weights.elevaciones || '10 kg'}`, url: "https://www.youtube.com/shorts/t9Cb4hLuGfE" },
-        { name: "Copa Tríceps", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/-A7Zx67qfAc" }
+        { name: "Patada Tríceps", getLoad: () => `Mancuerna ${progState.weights.patada || '15 kg'}`, url: "https://www.youtube.com/shorts/sYk-67UhxJk" }
       ],
       coreCalves: [
         { name: "Rueda Abdominal", load: "Peso Corporal", url: "https://www.youtube.com/shorts/lhYSUUWaFEU" },
@@ -264,13 +275,12 @@
         return getRandomItem(calfSchemes);
       }
 
-      // HOMBROS / PRESS / ELEVACIONES: DESDE 8 REPS
-      if (categoryKey === 'shouldersTriceps' || exerciseName.includes('Press') || exerciseName.includes('Elevaciones')) {
+      // HOMBROS / PRESS / ELEVACIONES / TRÍCEPS: 8 A 12 REPS
+      if (categoryKey === 'shouldersTriceps' || exerciseName.includes('Press') || exerciseName.includes('Elevaciones') || exerciseName.includes('Patada')) {
         const shoulderSchemes = [
           { desc: "4 series x 8 reps", intensity: "Pesado • RIR 1-2", rest: "60s" },
           { desc: "4 series x 10 reps", intensity: "Moderado • RIR 1-2", rest: "75s" },
-          { desc: "4 series x 12 reps", intensity: "Moderado-Alto • RIR 1", rest: "75s" },
-          { desc: "4 series x 15 reps", intensity: "Alto Volumen • RIR 1", rest: "90s" }
+          { desc: "4 series x 12 reps", intensity: "Moderado-Alto • RIR 1", rest: "75s" }
         ];
         return getRandomItem(shoulderSchemes);
       }
@@ -519,6 +529,13 @@
       ['10', '15', '20'].forEach(w => {
         const btn = document.getElementById(`w-elev-${w}`);
         if (btn) btn.className = (progState.weights.elevaciones === `${w} kg`)
+          ? "p-2.5 text-xs rounded-xl border border-brand-500 bg-brand-500/10 text-brand-accent font-bold"
+          : "p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-bold";
+      });
+
+      ['15', '20', '25'].forEach(w => {
+        const btn = document.getElementById(`w-patada-${w}`);
+        if (btn) btn.className = (progState.weights.patada === `${w} kg`)
           ? "p-2.5 text-xs rounded-xl border border-brand-500 bg-brand-500/10 text-brand-accent font-bold"
           : "p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-bold";
       });
