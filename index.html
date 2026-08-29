@@ -222,10 +222,15 @@
         { name: "Elevaciones Laterales", getLoad: () => `Mancuerna ${progState.weights.elevaciones || '10 kg'}`, url: "https://www.youtube.com/shorts/t9Cb4hLuGfE" },
         { name: "Patada Tríceps", getLoad: () => `Mancuerna ${progState.weights.patada || '15 kg'}`, url: "https://www.youtube.com/shorts/sYk-67UhxJk" }
       ],
-      coreCalves: [
+      core: [
         { name: "Rueda Abdominal", load: "Peso Corporal", url: "https://www.youtube.com/shorts/lhYSUUWaFEU" },
+        { name: "Rueda Abdominal Oblicua", load: "Peso Corporal", url: "https://www.youtube.com/shorts/IattetCIx6g" },
+        { name: "Rueda Abdominal Parado", load: "Peso Corporal", url: "https://www.youtube.com/shorts/GBlR1yjZdVs" }
+      ],
+      calves: [
         { name: "Pantorrillas Unilateral", load: "Mancuerna 15 kg", url: "https://www.youtube.com/shorts/fKt3Q0peC0Y" },
-        { name: "Pantorrillas Bilateral", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/_5W3WPS1bGU" }
+        { name: "Pantorrillas Bilateral", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/_5W3WPS1bGU" },
+        { name: "Pantorrillas Sentado", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/MN6T4Mituzo" }
       ]
     };
 
@@ -266,7 +271,7 @@
       }
 
       // PANTORRILLAS: ALTO VOLUMEN
-      if (exerciseName.includes('Pantorrillas')) {
+      if (exerciseName.includes('Pantorrillas') || categoryKey === 'calves') {
         const calfSchemes = [
           { desc: "4 series x 15 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
           { desc: "4 series x 20 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" },
@@ -324,9 +329,12 @@
       const shuffledMid = shuffleArray(midPool);
 
       // 3. Puestos 5 y 6 VARIABLES: Core y Pantorrillas
+      const coreEx = getNonRepeatingExercise(EXERCISE_DATABASE.core);
+      const calfEx = getNonRepeatingExercise(EXERCISE_DATABASE.calves);
+
       const endPool = [
-        { type: "Core", categoryKey: "coreCalves", ex: EXERCISE_DATABASE.coreCalves[0] },
-        { type: "Pantorrillas", categoryKey: "coreCalves", ex: getRandomItem([EXERCISE_DATABASE.coreCalves[1], EXERCISE_DATABASE.coreCalves[2]]) }
+        { type: "Core", categoryKey: "core", ex: coreEx },
+        { type: "Pantorrillas", categoryKey: "calves", ex: calfEx }
       ];
       const shuffledEnd = shuffleArray(endPool);
 
