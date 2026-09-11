@@ -134,7 +134,7 @@
       <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 space-y-4 shadow-sm">
         <div>
           <h2 class="text-lg font-bold text-white mb-1">Ajuste de Cargas</h2>
-          <p class="text-xs text-slate-400">Configura el peso asignado para los ejercicios de hombro.</p>
+          <p class="text-xs text-slate-400">Configura el peso asignado para los ejercicios de hombro y tríceps.</p>
         </div>
 
         <!-- Cargas Seleccionables -->
@@ -200,11 +200,11 @@
       localStorage.setItem('fullbody_state', JSON.stringify(progState));
     }
 
-    // BASE DE DATOS DE EJERCICIOS CON LINKS DE YOUTUBE
+    // BASE DE DATOS DE EJERCICIOS ACTUALIZADA CON LOS NUEVOS CAMBIOS
     const EXERCISE_DATABASE = {
       legs: [
         { name: "Sentadilla Frontal", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/BCGKtZ0fCiI" },
-        { name: "Sentadilla Frontal Elevada", load: "2 Mancuernas", url: "https://www.youtube.com/watch?v=2ynGW-Kb8Hc" },
+        { name: "Sentadilla Goblet", load: "Mancuerna 25 kg", url: "https://www.youtube.com/shorts/2KbVt1Gl0VM" },
         { name: "Sentadilla Sumo", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/PYOWcPYckvg" }
       ],
       chest: [
@@ -225,16 +225,15 @@
       core: [
         { name: "Rueda Abdominal", load: "Peso Corporal", url: "https://www.youtube.com/shorts/lhYSUUWaFEU" },
         { name: "Rueda Abdominal Oblicua", load: "Peso Corporal", url: "https://www.youtube.com/shorts/IattetCIx6g" },
-        { name: "Rueda Abdominal Parado", load: "Peso Corporal", url: "https://www.youtube.com/shorts/GBlR1yjZdVs" }
+        { name: "Rueda Abdominal Excéntrica", load: "Peso Corporal", url: "https://www.youtube.com/shorts/U1itoMMI8CY" }
       ],
       calves: [
         { name: "Pantorrillas Unilateral", load: "Mancuerna 25 kg", url: "https://www.youtube.com/shorts/fKt3Q0peC0Y" },
         { name: "Pantorrillas Bilateral", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/_5W3WPS1bGU" },
-        { name: "Pantorrillas Bilateral Elevada", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/MN6T4Mituzo" }
+        { name: "Pantorrillas Sentado", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/MN6T4Mituzo" }
       ]
     };
 
-    // FUNCIONES AUXILIARES
     function getRandomItem(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
     }
@@ -248,8 +247,9 @@
       return array;
     }
 
-    // ESQUEMA DINÁMICO DE REPETICIONES
+    // ESQUEMA DINÁMICO Y ESPECÍFICO DE REPETICIONES
     function getRandomRepScheme(categoryKey, exerciseName = '', isPushup = false) {
+      // 1. FLEXIONES DE PECHO
       if (isPushup) {
         const pushupSchemes = [
           { desc: "4 series x 15 reps", intensity: "Moderado • RIR 2", rest: "60s" },
@@ -259,18 +259,48 @@
         return getRandomItem(pushupSchemes);
       }
 
-      // PIERNAS / SENTADILLAS: MÍNIMO 12 REPS SIEMPRE
+      // 2. PIERNAS: REGLAS ESPECÍFICAS
       if (categoryKey === 'legs') {
+        // Sentadilla Goblet: Al ser con una sola mancuerna (25 kg), se trabaja a más repeticiones
+        if (exerciseName === 'Sentadilla Goblet') {
+          const gobletSchemes = [
+            { desc: "4 series x 15 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" },
+            { desc: "4 series x 18 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" },
+            { desc: "4 series x 20 reps", intensity: "Resistencia • RIR 1", rest: "60s" },
+            { desc: "4 series x 25 reps", intensity: "Al Fallo • RIR 0-1", rest: "75s" }
+          ];
+          return getRandomItem(gobletSchemes);
+        }
+        // Sentadilla Frontal y Sumo (2 mancuernas)
         const legSchemes = [
           { desc: "4 series x 12 reps", intensity: "Moderado • RIR 1-2", rest: "75s" },
-          { desc: "4 series x 15 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" },
-          { desc: "4 series x 18 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" },
-          { desc: "4 series x 20 reps", intensity: "Resistencia • RIR 1", rest: "60s" }
+          { desc: "4 series x 14 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
+          { desc: "4 series x 15 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
         ];
         return getRandomItem(legSchemes);
       }
 
-      // PANTORRILLAS: ALTO VOLUMEN
+      // 3. CORE: REGLAS ESPECÍFICAS
+      if (categoryKey === 'core') {
+        // Rueda Abdominal Excéntrica: Menor número de reps debido a la tensión e isometría
+        if (exerciseName === 'Rueda Abdominal Excéntrica') {
+          const eccentricSchemes = [
+            { desc: "4 series x 5 reps (3s sostén)", intensity: "Tensión Excéntrica • RIR 1", rest: "60s" },
+            { desc: "4 series x 6 reps (3s sostén)", intensity: "Tensión Excéntrica • RIR 1", rest: "60s" },
+            { desc: "4 series x 8 reps (2s sostén)", intensity: "Máximo Control • RIR 0-1", rest: "75s" }
+          ];
+          return getRandomItem(eccentricSchemes);
+        }
+        // Rueda Abdominal Estándar y Oblicua
+        const coreSchemes = [
+          { desc: "4 series x 10 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
+          { desc: "4 series x 12 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
+          { desc: "4 series x 15 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
+        ];
+        return getRandomItem(coreSchemes);
+      }
+
+      // 4. PANTORRILLAS: ALTO VOLUMEN
       if (exerciseName.includes('Pantorrillas') || categoryKey === 'calves') {
         const calfSchemes = [
           { desc: "4 series x 15 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
@@ -280,7 +310,7 @@
         return getRandomItem(calfSchemes);
       }
 
-      // HOMBROS / PRESS / ELEVACIONES / TRÍCEPS: 8 A 12 REPS
+      // 5. HOMBROS / PRESS / ELEVACIONES / TRÍCEPS: 8 A 12 REPS
       if (categoryKey === 'shouldersTriceps' || exerciseName.includes('Press') || exerciseName.includes('Elevaciones') || exerciseName.includes('Patada')) {
         const shoulderSchemes = [
           { desc: "4 series x 8 reps", intensity: "Pesado • RIR 1-2", rest: "60s" },
@@ -290,7 +320,7 @@
         return getRandomItem(shoulderSchemes);
       }
 
-      // ESQUEMA ESTÁNDAR
+      // 6. ESQUEMA ESTÁNDAR
       const standardSchemes = [
         { desc: "4 series x 10 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
         { desc: "4 series x 12 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
@@ -299,7 +329,6 @@
       return getRandomItem(standardSchemes);
     }
 
-    // PREVENIR REPETICIONES EXCESIVAS
     function getNonRepeatingExercise(pool) {
       const usedInHistory = progState.usedExerciseHistory || [];
       const available = pool.filter(ex => !usedInHistory.includes(ex.name));
@@ -375,7 +404,6 @@
       renderWorkoutView();
     }
 
-    // OBTENER TÍTULO CON DÍA DE LA SEMANA (e.g. "Sesión Lunes")
     function getSessionTitleForDate(dateStr) {
       if (!dateStr) return "Sesión";
       const [year, month, day] = dateStr.split('-');
@@ -437,14 +465,14 @@
       window.scrollTo(0, 0);
     }
 
-    // COMPLETAR ENTRENAMIENTO Y GUARDAR CON DÍA DE LA SEMANA
+    // COMPLETAR ENTRENAMIENTO Y GUARDAR EN HISTORIAL
     function completeWorkout() {
       const titleName = getSessionTitleForDate(selectedDate);
 
       const entry = {
         id: Date.now(),
         date: selectedDate,
-        title: titleName, // Ej: "Sesión Lunes", "Sesión Miércoles", etc.
+        title: titleName,
         count: currentWorkoutData.length
       };
       
@@ -498,7 +526,6 @@
       renderHistory();
     }
 
-    // NAVEGACIÓN Y VISTAS
     function showDashboard() {
       document.getElementById('view-workout').classList.add('hidden');
       document.getElementById('view-progression').classList.add('hidden');
@@ -549,7 +576,6 @@
       });
     }
 
-    // GESTIÓN DE FECHA
     function updateDateDisplay(val) {
       if (!val) return;
       selectedDate = val;
@@ -559,7 +585,6 @@
       document.getElementById('date-display').innerText = d.toLocaleDateString('es-ES', options);
     }
 
-    // INICIALIZACIÓN
     window.onload = function() {
       const today = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('input-date');
