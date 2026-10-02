@@ -6,6 +6,7 @@
   <title>Rutinas</title>
   <!-- Favicon Emoji -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💪🏽</text></svg>">
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome Icons -->
@@ -29,6 +30,7 @@
       }
     }
   </script>
+
   <style>
     body {
       -webkit-tap-highlight-color: transparent;
@@ -181,18 +183,14 @@
           <!-- Display digital del temporizador -->
           <div id="timer-display-box" class="bg-slate-950 border border-slate-800 rounded-xl p-3 text-center transition-all">
             <div id="timer-clock" class="text-3xl font-black font-mono tracking-wider text-slate-200">00:00</div>
-            <p id="timer-label" class="text-[11px] text-slate-500 font-medium mt-0.5">Selecciona descanso o cambio de ejercicio</p>
+            <p id="timer-label" class="text-[11px] text-slate-500 font-medium mt-0.5">Selecciona el descanso</p>
           </div>
 
-          <!-- Botones de Presets de Tiempo -->
-          <div class="grid grid-cols-2 gap-2.5">
-            <button onclick="startTimer(60, 'Descanso entre series')" class="bg-slate-950 hover:bg-slate-800 border border-brand-500/40 text-brand-accent py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
+          <!-- Botones de Presets de Tiempo (Ajustado a 1 minuto únicamente) -->
+          <div class="w-full">
+            <button onclick="startTimer(60, 'Descanso entre series')" class="w-full bg-slate-950 hover:bg-slate-800 border border-brand-500/40 text-brand-accent py-3 px-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
               <i class="fa-solid fa-hourglass-half text-brand-500"></i>
-              <span>1 MIN (Descanso)</span>
-            </button>
-            <button onclick="startTimer(120, 'Cambio de ejercicio')" class="bg-slate-950 hover:bg-slate-800 border border-emerald-500/40 text-emerald-400 py-2.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
-              <i class="fa-solid fa-repeat text-emerald-500"></i>
-              <span>2 MIN (Cambio)</span>
+              <span>1 MINUTO DE DESCANSO</span>
             </button>
           </div>
 
@@ -230,11 +228,6 @@
 
       <!-- Controles de Finalización / Reset -->
       <div class="pt-4 space-y-2">
-        <button onclick="completeWorkout()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black py-4 rounded-xl text-base shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 transition active:scale-[0.98]">
-          <i class="fa-solid fa-circle-check text-lg"></i>
-          <span>FINALIZAR ENTRENAMIENTO</span>
-        </button>
-        
         <button onclick="abandonWorkoutPrompt()" class="w-full bg-transparent hover:bg-rose-500/10 text-rose-400/80 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
           <i class="fa-solid fa-trash-can"></i>
           <span>Descartar este entrenamiento</span>
@@ -665,8 +658,10 @@
       const nextBtn = document.getElementById('btn-next-ex');
       if (guidedIndex === totalEx - 1) {
         nextBtn.innerHTML = `<span>Finalizar</span> <i class="fa-solid fa-flag-checkered"></i>`;
+        nextBtn.className = "flex-1 bg-emerald-500 hover:bg-emerald-600 text-slate-950 py-3.5 rounded-xl text-sm font-black transition flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-emerald-500/20";
       } else {
         nextBtn.innerHTML = `<span>Siguiente</span> <i class="fa-solid fa-chevron-right"></i>`;
+        nextBtn.className = "flex-1 bg-brand-500 hover:bg-brand-600 text-slate-950 py-3.5 rounded-xl text-sm font-black transition flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-brand-500/20";
       }
 
       // Renderizar Tarjeta de Ejercicio
@@ -1011,7 +1006,7 @@
 
       document.getElementById('timer-clock').innerText = "00:00";
       document.getElementById('timer-clock').className = "text-3xl font-black font-mono tracking-wider text-slate-200";
-      document.getElementById('timer-label').innerText = "Selecciona descanso o cambio de ejercicio";
+      document.getElementById('timer-label').innerText = "Selecciona el descanso";
       document.getElementById('timer-status-badge').innerText = "Listos";
       document.getElementById('timer-status-badge').className = "text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold";
       document.getElementById('timer-controls').classList.add('hidden');
@@ -1065,7 +1060,6 @@
       renderHistory();
     }
 
-    // Dibuja el historial reciente y prepara las acciones para eliminar registros.
     // Dibuja el historial reciente y prepara las acciones para eliminar registros.
     function renderHistory() {
       const historyList = document.getElementById('history-list');
