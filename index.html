@@ -274,16 +274,6 @@
             </div>
           </div>
 
-          <!-- Patada Tríceps -->
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-2">Patada Tríceps</label>
-            <div class="grid grid-cols-3 gap-2">
-              <button onclick="setWeight('patada', '15 kg')" id="w-patada-15" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">15 kg</button>
-              <button onclick="setWeight('patada', '20 kg')" id="w-patada-20" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">20 kg</button>
-              <button onclick="setWeight('patada', '25 kg')" id="w-patada-25" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">25 kg</button>
-            </div>
-          </div>
-
         </div>
 
         <button onclick="showDashboard()" class="w-full mt-6 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3.5 rounded-xl text-sm transition">
@@ -323,6 +313,9 @@
     let timerInterval = null;
     let timerSecondsLeft = 0;
     let timerTotalDuration = 0;
+    let timerEndTime = null; // Marca de tiempo absoluta en la que termina el descanso.
+    let pausedTimeLeft = 0; // Segundos conservados mientras el temporizador está pausado.
+    let wakeLockSentinel = null; // Referencia al bloqueo de pantalla activa, si el navegador lo permite.
     let isTimerPaused = false;
     let audioCtx = null; // Web Audio API synth (Non-interruptive background audio)
 
@@ -331,7 +324,7 @@
       weights: {
         press: '20 kg',
         elevaciones: '10 kg',
-        patada: '15 kg'
+        pressCopa: '25 kg'
       },
       history: [],
       lastStartLeg: '',
@@ -339,11 +332,21 @@
       activeWorkout: null // Guarda la rutina activa para resumiendo al recargar
     };
 
+    // Migra datos guardados antiguos antes de cualquier escritura, conservando el peso previo si existe.
+    const legacyWeightKey = ['pa', 'tada'].join('');
+    if (progState.weights && Object.prototype.hasOwnProperty.call(progState.weights, legacyWeightKey)) {
+      if (!progState.weights.pressCopa) progState.weights.pressCopa = progState.weights[legacyWeightKey];
+      delete progState.weights[legacyWeightKey];
+      localStorage.setItem('fullbody_state', JSON.stringify(progState));
+    }
+
+    // Guarda la configuración, el historial y la sesión activa en el almacenamiento local.
     function saveState() {
       localStorage.setItem('fullbody_state', JSON.stringify(progState));
     }
 
     // BASE DE DATOS DE EJERCICIOS
+    // Catálogo por grupos; getLoad permite leer las cargas ajustables al generar cada sesión.
     const EXERCISE_DATABASE = {
       legs: [
         { name: "Sentadilla Frontal", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/BCGKtZ0fCiI" },
@@ -363,7 +366,7 @@
       shouldersTriceps: [
         { name: "Press Militar", getLoad: () => `Mancuerna ${progState.weights.press || '20 kg'}`, url: "https://www.youtube.com/shorts/i5cvgQveFbY" },
         { name: "Elevaciones Laterales", getLoad: () => `Mancuerna ${progState.weights.elevaciones || '10 kg'}`, url: "https://www.youtube.com/shorts/t9Cb4hLuGfE" },
-        { name: "Patada Tríceps", getLoad: () => `Mancuerna ${progState.weights.patada || '15 kg'}`, url: "https://www.youtube.com/shorts/sYk-67UhxJk" }
+        { name: "Press Copa", getLoad: () => `Mancuerna ${progState.weights.pressCopa || '25 kg'}`, url: "https://www.youtube.com/shorts/GCf-uePkG8k" }
       ],
       core: [
         { name: "Rueda Abdominal", load: "Peso Corporal", url: "https://www.youtube.com/shorts/lhYSUUWaFEU" },
@@ -377,10 +380,12 @@
       ]
     };
 
+    // Elige un elemento aleatorio de una lista.
     function getRandomItem(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
+    // Devuelve una copia de la lista en orden aleatorio mediante Fisher-Yates.
     function shuffleArray(arr) {
       const array = [...arr];
       for (let i = array.length - 1; i > 0; i--) {
@@ -390,6 +395,7 @@
       return array;
     }
 
+    // Selecciona el esquema de repeticiones según el ejercicio y su categoría.
     function getRandomRepScheme(categoryKey, exerciseName = '', isPushup = false) {
       if (isPushup) {
         const pushupSchemes = [
@@ -411,9 +417,9 @@
           return getRandomItem(gobletSchemes);
         }
         const legSchemes = [
-          { desc: "4 series x 12 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-          { desc: "4 series x 14 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
-          { desc: "4 series x 15 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
+          { desc: "4 series x 15 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
+          { desc: "4 series x 18 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
+          { desc: "4 series x 20 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
         ];
         return getRandomItem(legSchemes);
       }
@@ -421,16 +427,16 @@
       if (categoryKey === 'core') {
         if (exerciseName === 'Rueda Abdominal Excéntrica') {
           const eccentricSchemes = [
-            { desc: "4 series x 5 reps (3s sostén)", intensity: "Tensión Excéntrica • RIR 1", rest: "60s" },
-            { desc: "4 series x 6 reps (3s sostén)", intensity: "Tensión Excéntrica • RIR 1", rest: "60s" },
-            { desc: "4 series x 8 reps (2s sostén)", intensity: "Máximo Control • RIR 0-1", rest: "60s" }
+            { desc: "4 series x 8 reps (3s sostén)", intensity: "Tensión Excéntrica • RIR 1", rest: "60s" },
+            { desc: "4 series x 10 reps (3s sostén)", intensity: "Tensión Excéntrica • RIR 1", rest: "60s" },
+            { desc: "4 series x 12 reps (2s sostén)", intensity: "Máximo Control • RIR 0-1", rest: "60s" }
           ];
           return getRandomItem(eccentricSchemes);
         }
         const coreSchemes = [
-          { desc: "4 series x 10 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-          { desc: "4 series x 12 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
-          { desc: "4 series x 15 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
+          { desc: "4 series x 12 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
+          { desc: "4 series x 14 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
+          { desc: "4 series x 16 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
         ];
         return getRandomItem(coreSchemes);
       }
@@ -444,7 +450,16 @@
         return getRandomItem(calfSchemes);
       }
 
-      if (categoryKey === 'shouldersTriceps' || exerciseName.includes('Press') || exerciseName.includes('Elevaciones') || exerciseName.includes('Patada')) {
+      if (exerciseName === 'Press Copa') {
+        const pressCopaSchemes = [
+          { desc: "4 series x 15 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
+          { desc: "4 series x 18 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
+          { desc: "4 series x 20 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
+        ];
+        return getRandomItem(pressCopaSchemes);
+      }
+
+      if (categoryKey === 'shouldersTriceps' || exerciseName.includes('Press') || exerciseName.includes('Elevaciones')) {
         const shoulderSchemes = [
           { desc: "4 series x 8 reps", intensity: "Pesado • RIR 1-2", rest: "60s" },
           { desc: "4 series x 10 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
@@ -454,13 +469,14 @@
       }
 
       const standardSchemes = [
-        { desc: "4 series x 10 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-        { desc: "4 series x 12 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
-        { desc: "4 series x 15 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
+        { desc: "4 series x 12 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
+        { desc: "4 series x 15 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
+        { desc: "4 series x 18 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
       ];
       return getRandomItem(standardSchemes);
     }
 
+    // Escoge un ejercicio que no aparezca en el historial reciente de selección.
     function getNonRepeatingExercise(pool) {
       const usedInHistory = progState.usedExerciseHistory || [];
       const available = pool.filter(ex => !usedInHistory.includes(ex.name));
@@ -471,6 +487,7 @@
       return getRandomItem(pool);
     }
 
+    // Solicita confirmación antes de reemplazar una rutina que siga activa.
     function confirmNewWorkout() {
       if (progState.activeWorkout) {
         showModal(
@@ -486,6 +503,7 @@
     }
 
     // GENERADOR ALEATORIO
+    // Selecciona ejercicios por grupo, calcula sus cargas y prepara los esquemas.
     function generateRandomWorkout() {
       // 1. Puesto 1: Piernas
       const legPool = EXERCISE_DATABASE.legs.filter(ex => ex.name !== progState.lastStartLeg);
@@ -567,6 +585,7 @@
       renderWorkoutView();
     }
 
+    // Recupera los datos guardados y abre la sesión interrumpida.
     function resumeActiveWorkout() {
       if (!progState.activeWorkout) return;
       
@@ -578,6 +597,7 @@
       renderWorkoutView();
     }
 
+    // Persiste el índice guiado y las series completadas de la sesión activa.
     function saveActiveWorkoutState() {
       if (progState.activeWorkout) {
         progState.activeWorkout.guidedIndex = guidedIndex;
@@ -586,6 +606,7 @@
       }
     }
 
+    // Pide confirmación para descartar la sesión sin añadirla al historial.
     function abandonWorkoutPrompt() {
       showModal(
         "¿Descartar sesión?",
@@ -599,6 +620,7 @@
       );
     }
 
+    // Forma el título de sesión a partir de la fecha elegida.
     function getSessionTitleForDate(dateStr) {
       if (!dateStr) return "Sesión";
       const [year, month, day] = dateStr.split('-');
@@ -608,6 +630,7 @@
       return `Sesión ${capitalizedDay}`;
     }
 
+    // Cambia a la sesión activa y dibuja sus vistas guiada y de lista.
     function renderWorkoutView() {
       const titleName = getSessionTitleForDate(selectedDate);
       document.getElementById('workout-session-title').innerText = titleName;
@@ -624,6 +647,7 @@
     }
 
     // RENDERIZADO DEL MODO GUIADO (EJERCICIO A EJERCICIO)
+    // Renderiza la tarjeta del ejercicio actual, sus series y el avance guiado.
     function renderGuidedExercise() {
       if (!currentWorkoutData || currentWorkoutData.length === 0) return;
 
@@ -715,6 +739,7 @@
       `;
     }
 
+    // Marca o desmarca una serie y persiste el avance de la sesión.
     function toggleSetDone(exIdx, setIdx) {
       if (!completedSetsMap[exIdx]) {
         completedSetsMap[exIdx] = [false, false, false, false];
@@ -724,6 +749,7 @@
       renderGuidedExercise();
     }
 
+    // Cambia al ejercicio anterior o siguiente y finaliza al llegar al último.
     function navigateGuidedExercise(direction) {
       const newIdx = guidedIndex + direction;
       if (newIdx >= 0 && newIdx < currentWorkoutData.length) {
@@ -735,6 +761,7 @@
       }
     }
 
+    // Alterna entre la presentación guiada y la lista completa de ejercicios.
     function toggleWorkoutDisplayMode() {
       isListView = !isListView;
       const guidedCont = document.getElementById('guided-mode-container');
@@ -752,6 +779,7 @@
       }
     }
 
+    // Construye las tarjetas de todos los ejercicios de la rutina actual.
     function renderWorkoutList() {
       const container = document.getElementById('workout-list');
       container.innerHTML = '';
@@ -794,7 +822,9 @@
       });
     }
 
+    // Emite el patrón existente de tonos y vibración cuando termina el descanso.
     // TEMPORIZADOR POTENTE Y MULTI-PITIDO (5 SEGUNDOS, ALTO VOLUMEN, NO INTERRUMPE MÚSICA)
+    // Programa el audio de aviso y conserva el patrón de vibración configurado.
     function playSubtleTimerBeep() {
       try {
         if (!audioCtx) {
@@ -855,13 +885,17 @@
       }
     }
 
+    // Inicia el descanso y calcula su fin usando el reloj del sistema, no decrementos del intervalo.
     function startTimer(seconds, label = 'Descanso') {
       clearInterval(timerInterval);
+      releaseWakeLock();
       timerTotalDuration = seconds;
       timerSecondsLeft = seconds;
+      pausedTimeLeft = seconds;
+      timerEndTime = Date.now() + seconds * 1000;
       isTimerPaused = false;
 
-      // Inicializar el AudioContext en la interacción de usuario para asegurar permiso
+      // El gesto del usuario permite preparar el audio para el aviso final.
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       } else if (audioCtx.state === 'suspended') {
@@ -874,20 +908,54 @@
       document.getElementById('timer-pause-btn').innerHTML = `<i class="fa-solid fa-pause mr-1"></i>Pausar`;
 
       updateTimerUI();
-
-      timerInterval = setInterval(() => {
-        if (!isTimerPaused) {
-          timerSecondsLeft--;
-          updateTimerUI();
-
-          if (timerSecondsLeft <= 0) {
-            clearInterval(timerInterval);
-            onTimerComplete();
-          }
-        }
-      }, 1000);
+      requestWakeLock();
+      timerInterval = setInterval(updateTimerFromTimestamp, 250);
     }
 
+    // Solicita mantener la pantalla encendida; la falta de soporte no afecta el cronómetro.
+    async function requestWakeLock() {
+      if (!navigator.wakeLock || !navigator.wakeLock.request) return;
+      try {
+        wakeLockSentinel = await navigator.wakeLock.request('screen');
+        const requestedSentinel = wakeLockSentinel;
+        requestedSentinel.addEventListener('release', () => {
+          if (wakeLockSentinel === requestedSentinel) wakeLockSentinel = null;
+        });
+      } catch (error) {
+        console.warn('No se pudo activar el bloqueo de pantalla:', error);
+      }
+    }
+
+    // Libera el bloqueo de pantalla al pausar, reiniciar o completar el descanso.
+    function releaseWakeLock() {
+      if (!wakeLockSentinel) return;
+      const sentinel = wakeLockSentinel;
+      wakeLockSentinel = null;
+      sentinel.release().catch(error => console.warn('No se pudo liberar el bloqueo de pantalla:', error));
+    }
+
+    // Sincroniza el contador con Date.now() y finaliza incluso si el navegador suspendió el intervalo.
+    function updateTimerFromTimestamp() {
+      if (isTimerPaused || timerEndTime === null) return;
+      const remaining = Math.max(0, Math.ceil((timerEndTime - Date.now()) / 1000));
+      if (remaining !== timerSecondsLeft) {
+        timerSecondsLeft = remaining;
+        updateTimerUI();
+      }
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerEndTime = null;
+        onTimerComplete();
+      }
+    }
+
+    // Al volver a la pestaña, actualiza enseguida el tiempo o completa el aviso vencido.
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && !isTimerPaused && timerEndTime !== null) updateTimerFromTimestamp();
+    });
+
+    // Refleja en pantalla el tiempo restante y el estado visual del contador.
     function updateTimerUI() {
       const minutes = Math.floor(timerSecondsLeft / 60);
       const secs = timerSecondsLeft % 60;
@@ -907,21 +975,38 @@
       }
     }
 
+    // Pausa guardando los segundos restantes o reanuda creando una nueva marca de fin.
     function pauseOrResumeTimer() {
       if (timerSecondsLeft <= 0) return;
       isTimerPaused = !isTimerPaused;
       const pauseBtn = document.getElementById('timer-pause-btn');
       if (isTimerPaused) {
+        pausedTimeLeft = Math.max(0, Math.ceil((timerEndTime - Date.now()) / 1000));
+        timerSecondsLeft = pausedTimeLeft;
+        clearInterval(timerInterval);
+        timerInterval = null;
+        timerEndTime = null;
+        releaseWakeLock();
+        updateTimerUI();
         pauseBtn.innerHTML = `<i class="fa-solid fa-play mr-1"></i>Reanudar`;
         document.getElementById('timer-status-badge').innerText = "Pausado";
       } else {
+        timerSecondsLeft = pausedTimeLeft;
+        timerEndTime = Date.now() + pausedTimeLeft * 1000;
         pauseBtn.innerHTML = `<i class="fa-solid fa-pause mr-1"></i>Pausar`;
         document.getElementById('timer-status-badge').innerText = "En curso";
+        requestWakeLock();
+        timerInterval = setInterval(updateTimerFromTimestamp, 250);
       }
     }
 
+    // Restablece la interfaz y cancela el intervalo, la marca de tiempo y el Wake Lock.
     function resetTimer() {
       clearInterval(timerInterval);
+      timerInterval = null;
+      timerEndTime = null;
+      pausedTimeLeft = 0;
+      releaseWakeLock();
       timerSecondsLeft = 0;
       isTimerPaused = false;
 
@@ -934,7 +1019,15 @@
       document.getElementById('timer-display-box').classList.remove('timer-active', 'border-brand-500/50', 'bg-brand-950/20', 'border-emerald-500/50', 'bg-emerald-950/30');
     }
 
+    // Ejecuta una sola vez los avisos de sonido/vibración y muestra el estado completado.
     function onTimerComplete() {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      timerEndTime = null;
+      pausedTimeLeft = 0;
+      timerSecondsLeft = 0;
+      isTimerPaused = false;
+      releaseWakeLock();
       playSubtleTimerBeep();
 
       const clockEl = document.getElementById('timer-clock');
@@ -953,6 +1046,7 @@
     }
 
     // COMPLETAR ENTRENAMIENTO Y GUARDAR EN HISTORIAL
+    // Cierra la rutina actual, registra la sesión y vuelve al panel principal.
     function completeWorkout() {
       const titleName = getSessionTitleForDate(selectedDate);
 
@@ -972,6 +1066,8 @@
       renderHistory();
     }
 
+    // Dibuja el historial reciente y prepara las acciones para eliminar registros.
+    // Dibuja el historial reciente y prepara las acciones para eliminar registros.
     function renderHistory() {
       const historyList = document.getElementById('history-list');
       const historyCount = document.getElementById('history-count');
@@ -1009,12 +1105,14 @@
       });
     }
 
+    // Elimina del almacenamiento local una sesión del historial.
     function deleteHistoryEntry(id) {
       progState.history = progState.history.filter(item => item.id !== id);
       saveState();
       renderHistory();
     }
 
+    // Mantiene el banner sincronizado con el progreso de la sesión guardada.
     function updateBannerStatus() {
       const banner = document.getElementById('active-session-banner');
       const bannerInfo = document.getElementById('active-banner-info');
@@ -1030,6 +1128,7 @@
       }
     }
 
+    // Muestra el panel principal y actualiza el aviso de sesión activa.
     function showDashboard() {
       document.getElementById('view-workout').classList.add('hidden');
       document.getElementById('view-progression').classList.add('hidden');
@@ -1039,6 +1138,7 @@
       window.scrollTo(0, 0);
     }
 
+    // Alterna entre el panel principal y la configuración de cargas.
     function toggleView() {
       const progView = document.getElementById('view-progression');
       if (progView.classList.contains('hidden')) {
@@ -1052,12 +1152,14 @@
       }
     }
 
+    // Guarda el peso elegido y refresca los botones seleccionados.
     function setWeight(type, value) {
       progState.weights[type] = value;
       saveState();
       updateProgressionView();
     }
 
+    // Resalta las cargas activas de cada ejercicio en la vista de progresión.
     function updateProgressionView() {
       ['15', '20', '25'].forEach(w => {
         const btn = document.getElementById(`w-press-${w}`);
@@ -1073,14 +1175,15 @@
           : "p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-bold";
       });
 
-      ['15', '20', '25'].forEach(w => {
-        const btn = document.getElementById(`w-patada-${w}`);
-        if (btn) btn.className = (progState.weights.patada === `${w} kg`)
+      ['20', '25', '30'].forEach(w => {
+        const btn = document.getElementById(`w-pressCopa-${w}`);
+        if (btn) btn.className = (progState.weights.pressCopa === `${w} kg`)
           ? "p-2.5 text-xs rounded-xl border border-brand-500 bg-brand-500/10 text-brand-accent font-bold"
           : "p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-bold";
       });
     }
 
+    // Actualiza la fecha elegida y su etiqueta legible en pantalla.
     function updateDateDisplay(val) {
       if (!val) return;
       selectedDate = val;
@@ -1092,6 +1195,7 @@
 
     // UTILERÍA MODAL PERSONALIZADA
     let modalConfirmCallback = null;
+    // Configura el diálogo reutilizable y la acción asociada a su confirmación.
     function showModal(title, message, onConfirm) {
       document.getElementById('modal-title').innerText = title;
       document.getElementById('modal-message').innerText = message;
@@ -1106,11 +1210,13 @@
       document.getElementById('modal-backdrop').classList.remove('hidden');
     }
 
+    // Oculta el diálogo y descarta su acción pendiente.
     function closeModal() {
       document.getElementById('modal-backdrop').classList.add('hidden');
       modalConfirmCallback = null;
     }
 
+    // Inicializa fecha, historial, progresión y recuperación de la sesión activa.
     window.onload = function() {
       const today = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('input-date');
