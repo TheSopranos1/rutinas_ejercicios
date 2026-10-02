@@ -409,10 +409,9 @@
       if (categoryKey === 'legs') {
         if (exerciseName === 'Sentadilla Goblet') {
           const gobletSchemes = [
-            { desc: "4 series x 15 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" },
-            { desc: "4 series x 18 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" },
-            { desc: "4 series x 20 reps", intensity: "Resistencia • RIR 1", rest: "60s" },
-            { desc: "4 series x 25 reps", intensity: "Al Fallo • RIR 0-1", rest: "60s" }
+            { desc: "4 series x 18 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
+            { desc: "4 series x 20 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
+            { desc: "4 series x 25 reps", intensity: "Alto Volumen • RIR 0-1", rest: "60s" }
           ];
           return getRandomItem(gobletSchemes);
         }
@@ -434,9 +433,9 @@
           return getRandomItem(eccentricSchemes);
         }
         const coreSchemes = [
-          { desc: "4 series x 12 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-          { desc: "4 series x 14 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
-          { desc: "4 series x 16 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
+          { desc: "4 series x 10 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
+          { desc: "4 series x 12 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
+          { desc: "4 series x 14 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
         ];
         return getRandomItem(coreSchemes);
       }
