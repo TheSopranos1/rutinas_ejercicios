@@ -47,6 +47,15 @@
       top: 0;
       width: auto;
     }
+    /* Quitar flechas por defecto en inputs numericos */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
     /* Pulse animation for active timer */
     @keyframes pulse-ring {
       0% { transform: scale(0.95); opacity: 0.8; }
@@ -170,7 +179,7 @@
           <!-- Contenido inyectado dinámicamente -->
         </div>
 
-        <!-- SECCIÓN TEMPORIZADOR INTEGRADO (NO INTERRUMPE MÚSICA) -->
+        <!-- SECCIÓN TEMPORIZADOR INTEGRADO -->
         <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3 shadow-md">
           <div class="flex justify-between items-center border-b border-slate-800 pb-2">
             <div class="flex items-center gap-2">
@@ -186,7 +195,7 @@
             <p id="timer-label" class="text-[11px] text-slate-500 font-medium mt-0.5">Selecciona el descanso</p>
           </div>
 
-          <!-- Botones de Presets de Tiempo (Ajustado a 1 minuto únicamente) -->
+          <!-- Botón de Presets de Tiempo (1 minuto) -->
           <div class="w-full">
             <button onclick="startTimer(60, 'Descanso entre series')" class="w-full bg-slate-950 hover:bg-slate-800 border border-brand-500/40 text-brand-accent py-3 px-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
               <i class="fa-solid fa-hourglass-half text-brand-500"></i>
@@ -236,46 +245,39 @@
 
     </section>
 
-    <!-- VISTA CONFIGURACIÓN: PROGRESIÓN -->
-    <section id="view-progression" class="hidden space-y-6">
-      <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800 space-y-4 shadow-sm">
-        <div>
-          <h2 class="text-lg font-bold text-white mb-1">Ajuste de Cargas</h2>
-          <p class="text-xs text-slate-400">Configura el peso asignado para los ejercicios de hombro y tríceps.</p>
+    <!-- VISTA CONFIGURACIÓN: PROGRESIÓN DE EJERCICIOS COMPLETA -->
+    <section id="view-progression" class="hidden space-y-5">
+      <div class="bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-800 space-y-4 shadow-sm">
+        <div class="flex justify-between items-start">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-brand-accent"></i>
+              <span>Progresión de Ejercicios</span>
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Lista completa por grupo muscular. Ajusta las <strong class="text-brand-accent">repeticiones (1 en 1)</strong> y el <strong class="text-brand-accent">peso (según el ejercicio)</strong>.
+            </p>
+          </div>
         </div>
 
-        <!-- Cargas Seleccionables -->
-        <div class="space-y-4 border-t border-slate-800 pt-4">
-          
-          <!-- Press Militar -->
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-2">Press Militar</label>
-            <div class="grid grid-cols-3 gap-2">
-              <button onclick="setWeight('press', '15 kg')" id="w-press-15" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">15 kg</button>
-              <button onclick="setWeight('press', '20 kg')" id="w-press-20" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">20 kg</button>
-              <button onclick="setWeight('press', '25 kg')" id="w-press-25" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">25 kg</button>
-            </div>
-          </div>
-
-          <!-- Elevaciones Laterales -->
-          <div>
-            <label class="block text-xs font-semibold text-slate-300 mb-2">Elevaciones Laterales</label>
-            <div class="grid grid-cols-3 gap-2">
-              <button onclick="setWeight('elevaciones', '10 kg')" id="w-elev-10" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">10 kg</button>
-              <button onclick="setWeight('elevaciones', '15 kg')" id="w-elev-15" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">15 kg</button>
-              <button onclick="setWeight('elevaciones', '20 kg')" id="w-elev-20" class="p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-300 font-bold transition">20 kg</button>
-            </div>
-          </div>
-
+        <!-- Contenedor dinámico de lista de ejercicios ordenados por grupo -->
+        <div id="progression-exercise-list" class="space-y-5 pt-2">
+          <!-- Inyectado mediante JS -->
         </div>
 
-        <button onclick="showDashboard()" class="w-full mt-6 bg-brand-500 hover:bg-brand-600 text-slate-950 font-bold py-3.5 rounded-xl text-sm transition">
-          Guardar y Volver
-        </button>
+        <!-- Botones de acción final -->
+        <div class="sticky bottom-4 pt-2 bg-slate-900/95 backdrop-blur-sm border-t border-slate-800 flex gap-2">
+          <button onclick="resetProgressionDefaults()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-4 py-3.5 rounded-xl text-xs transition border border-slate-700">
+            Restablecer
+          </button>
+          <button onclick="showDashboard()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-slate-950 font-black py-3.5 rounded-xl text-sm transition shadow-lg shadow-brand-500/20 active:scale-95">
+            Guardar y Volver
+          </button>
+        </div>
       </div>
     </section>
 
-    <!-- Modal Modal de Confirmación personalizado (en lugar de alert/confirm) -->
+    <!-- Modal de Confirmación personalizado -->
     <div id="modal-backdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-xs w-full space-y-4 shadow-2xl">
         <div class="text-center">
@@ -306,79 +308,234 @@
     let timerInterval = null;
     let timerSecondsLeft = 0;
     let timerTotalDuration = 0;
-    let timerEndTime = null; // Marca de tiempo absoluta en la que termina el descanso.
-    let pausedTimeLeft = 0; // Segundos conservados mientras el temporizador está pausado.
-    let wakeLockSentinel = null; // Referencia al bloqueo de pantalla activa, si el navegador lo permite.
+    let timerEndTime = null;
+    let pausedTimeLeft = 0;
+    let wakeLockSentinel = null;
     let isTimerPaused = false;
-    let audioCtx = null; // Web Audio API synth (Non-interruptive background audio)
+    let audioCtx = null;
+
+    // BASE DE DATOS DE EJERCICIOS ACTUALIZADA
+    const EXERCISE_DATABASE = {
+      legs: {
+        title: "Piernas",
+        icon: "fa-solid fa-person-running",
+        items: [
+          { name: "Sentadilla Frontal", defaultReps: 10, defaultWeight: 45, url: "https://www.youtube.com/shorts/BCGKtZ0fCiI" },
+          { name: "Sentadilla Sumo", defaultReps: 10, defaultWeight: 45, url: "https://www.youtube.com/shorts/PYOWcPYckvg" }
+        ]
+      },
+      chest: {
+        title: "Pecho",
+        icon: "fa-solid fa-child-reaching",
+        items: [
+          { name: "Flexiones Normales", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/3ljNPWHv1x4", isPushup: true },
+          { name: "Flexiones Declinadas", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/5Nm2wr3CgNA", isPushup: true },
+          { name: "Flexiones Diamante", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/UWmWbpIeBVI", isPushup: true }
+        ]
+      },
+      arms: {
+        title: "Brazos",
+        icon: "fa-solid fa-dumbbell",
+        items: [
+          { name: "Curl Bíceps", defaultReps: 10, defaultWeight: 45, url: "https://www.youtube.com/shorts/WrpQYs_n_Pw" },
+          { name: "Curl Martillo", defaultReps: 10, defaultWeight: 45, url: "https://www.youtube.com/shorts/QdEY-VZcPMU" },
+          { name: "Curl Concentrado", defaultReps: 10, defaultWeight: 25, url: "https://www.youtube.com/shorts/JM6T3kun48k" }
+        ]
+      },
+      shouldersTriceps: {
+        title: "Hombro y Tríceps",
+        icon: "fa-solid fa-hand-fist",
+        items: [
+          { name: "Press Militar", defaultReps: 10, defaultWeight: 20, url: "https://www.youtube.com/shorts/i5cvgQveFbY" },
+          { name: "Elevaciones Laterales", defaultReps: 10, defaultWeight: 10, url: "https://www.youtube.com/shorts/t9Cb4hLuGfE" },
+          { name: "Press Copa", defaultReps: 10, defaultWeight: 25, url: "https://www.youtube.com/shorts/GCf-uePkG8k" }
+        ]
+      },
+      core: {
+        title: "Core",
+        icon: "fa-solid fa-arrows-spin",
+        items: [
+          { name: "Rueda Abdominal", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/lhYSUUWaFEU" },
+          { name: "Rueda Abdominal Excéntrica", defaultReps: 8, defaultWeight: 0, url: "https://www.youtube.com/shorts/U1itoMMI8CY" }
+        ]
+      },
+      calves: {
+        title: "Pantorrillas",
+        icon: "fa-solid fa-shoe-prints",
+        items: [
+          { name: "Pantorrillas Unilateral", defaultReps: 20, defaultWeight: 25, url: "https://www.youtube.com/shorts/fKt3Q0peC0Y" },
+          { name: "Pantorrillas Bilateral", defaultReps: 15, defaultWeight: 45, url: "https://www.youtube.com/shorts/_5W3WPS1bGU" }
+        ]
+      }
+    };
 
     // ESTADO DE PERSISTENCIA
     let progState = JSON.parse(localStorage.getItem('fullbody_state')) || {
-      weights: {
-        press: '20 kg',
-        elevaciones: '10 kg',
-        pressCopa: '25 kg'
-      },
+      exerciseConfigs: {},
       history: [],
-      lastStartLeg: '',
-      usedExerciseHistory: [],
-      activeWorkout: null // Guarda la rutina activa para resumiendo al recargar
+      lastSessionExercises: [],
+      activeWorkout: null
     };
 
-    // Migra datos guardados antiguos antes de cualquier escritura, conservando el peso previo si existe.
-    const legacyWeightKey = ['pa', 'tada'].join('');
-    if (progState.weights && Object.prototype.hasOwnProperty.call(progState.weights, legacyWeightKey)) {
-      if (!progState.weights.pressCopa) progState.weights.pressCopa = progState.weights[legacyWeightKey];
-      delete progState.weights[legacyWeightKey];
-      localStorage.setItem('fullbody_state', JSON.stringify(progState));
+    if (!progState.exerciseConfigs) {
+      progState.exerciseConfigs = {};
     }
 
-    // Guarda la configuración, el historial y la sesión activa en el almacenamiento local.
     function saveState() {
       localStorage.setItem('fullbody_state', JSON.stringify(progState));
     }
 
-    // BASE DE DATOS DE EJERCICIOS
-    // Catálogo por grupos; getLoad permite leer las cargas ajustables al generar cada sesión.
-    const EXERCISE_DATABASE = {
-      legs: [
-        { name: "Sentadilla Frontal", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/BCGKtZ0fCiI" },
-        { name: "Sentadilla Goblet", load: "Mancuerna 25 kg", url: "https://www.youtube.com/shorts/2KbVt1Gl0VM" },
-        { name: "Sentadilla Sumo", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/PYOWcPYckvg" }
-      ],
-      chest: [
-        { name: "Flexiones Normales", load: "Peso Corporal", url: "https://www.youtube.com/shorts/3ljNPWHv1x4", isPushup: true },
-        { name: "Flexiones Declinadas", load: "Peso Corporal", url: "https://www.youtube.com/shorts/5Nm2wr3CgNA", isPushup: true },
-        { name: "Flexiones Diamante", load: "Peso Corporal", url: "https://www.youtube.com/shorts/UWmWbpIeBVI", isPushup: true }
-      ],
-      arms: [
-        { name: "Curl Bíceps", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/WrpQYs_n_Pw" },
-        { name: "Curl Martillo", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/QdEY-VZcPMU" },
-        { name: "Curl Concentrado", load: "Mancuerna 25 kg", url: "https://www.youtube.com/shorts/JM6T3kun48k" }
-      ],
-      shouldersTriceps: [
-        { name: "Press Militar", getLoad: () => `Mancuerna ${progState.weights.press || '20 kg'}`, url: "https://www.youtube.com/shorts/i5cvgQveFbY" },
-        { name: "Elevaciones Laterales", getLoad: () => `Mancuerna ${progState.weights.elevaciones || '10 kg'}`, url: "https://www.youtube.com/shorts/t9Cb4hLuGfE" },
-        { name: "Press Copa", getLoad: () => `Mancuerna ${progState.weights.pressCopa || '25 kg'}`, url: "https://www.youtube.com/shorts/GCf-uePkG8k" }
-      ],
-      core: [
-        { name: "Rueda Abdominal", load: "Peso Corporal", url: "https://www.youtube.com/shorts/lhYSUUWaFEU" },
-        { name: "Rueda Abdominal Oblicua", load: "Peso Corporal", url: "https://www.youtube.com/shorts/IattetCIx6g" },
-        { name: "Rueda Abdominal Excéntrica", load: "Peso Corporal", url: "https://www.youtube.com/shorts/U1itoMMI8CY" }
-      ],
-      calves: [
-        { name: "Pantorrillas Unilateral", load: "Mancuerna 25 kg", url: "https://www.youtube.com/shorts/fKt3Q0peC0Y" },
-        { name: "Pantorrillas Bilateral", load: "2 Mancuernas", url: "https://www.youtube.com/shorts/_5W3WPS1bGU" },
-        { name: "Pantorrillas Concentrado", load: "Mancuerna 25 kg", url: "https://www.youtube.com/shorts/H21-5uUiEzI" }
-      ]
-    };
+    function getExerciseConfig(exName) {
+      if (progState.exerciseConfigs && progState.exerciseConfigs[exName]) {
+        return progState.exerciseConfigs[exName];
+      }
+      
+      for (const groupKey in EXERCISE_DATABASE) {
+        const item = EXERCISE_DATABASE[groupKey].items.find(e => e.name === exName);
+        if (item) {
+          return { reps: item.defaultReps, weight: item.defaultWeight };
+        }
+      }
 
-    // Elige un elemento aleatorio de una lista.
+      return { reps: 12, weight: 15 };
+    }
+
+    function updateExerciseConfig(exName, field, delta) {
+      const current = getExerciseConfig(exName);
+      if (!progState.exerciseConfigs[exName]) {
+        progState.exerciseConfigs[exName] = { ...current };
+      }
+
+      if (field === 'reps') {
+        const newReps = Math.max(1, (progState.exerciseConfigs[exName].reps || current.reps) + delta);
+        progState.exerciseConfigs[exName].reps = newReps;
+      } else if (field === 'weight') {
+        const newWeight = Math.max(0, (progState.exerciseConfigs[exName].weight || current.weight) + delta);
+        progState.exerciseConfigs[exName].weight = newWeight;
+      }
+
+      saveState();
+      renderProgressionView();
+    }
+
+    function setExerciseConfigDirect(exName, field, val) {
+      const numVal = parseInt(val, 10);
+      if (isNaN(numVal)) return;
+
+      const current = getExerciseConfig(exName);
+      if (!progState.exerciseConfigs[exName]) {
+        progState.exerciseConfigs[exName] = { ...current };
+      }
+
+      if (field === 'reps') {
+        progState.exerciseConfigs[exName].reps = Math.max(1, numVal);
+      } else if (field === 'weight') {
+        progState.exerciseConfigs[exName].weight = Math.max(0, numVal);
+      }
+
+      saveState();
+    }
+
+    function resetProgressionDefaults() {
+      showModal(
+        "¿Restablecer progresiones?",
+        "Se restaurarán las repeticiones y pesos originales de todos los ejercicios.",
+        () => {
+          progState.exerciseConfigs = {};
+          saveState();
+          renderProgressionView();
+        }
+      );
+    }
+
+    function renderProgressionView() {
+      const container = document.getElementById('progression-exercise-list');
+      if (!container) return;
+
+      container.innerHTML = '';
+      const groupKeys = ['legs', 'chest', 'arms', 'shouldersTriceps', 'core', 'calves'];
+
+      groupKeys.forEach(groupKey => {
+        const group = EXERCISE_DATABASE[groupKey];
+        if (!group) return;
+
+        const groupWrapper = document.createElement('div');
+        groupWrapper.className = "bg-slate-950 rounded-xl p-3 border border-slate-800 space-y-3";
+
+        groupWrapper.innerHTML = `
+          <div class="flex items-center gap-2 pb-2 border-b border-slate-800 text-brand-accent font-black text-xs uppercase tracking-wider">
+            <i class="${group.icon} text-sm"></i>
+            <span>${group.title}</span>
+          </div>
+        `;
+
+        const itemsContainer = document.createElement('div');
+        itemsContainer.className = "space-y-3";
+
+        group.items.forEach(item => {
+          const cfg = getExerciseConfig(item.name);
+          const wStep = item.weightStep || 5;
+
+          const exRow = document.createElement('div');
+          exRow.className = "bg-slate-900 border border-slate-800/80 rounded-xl p-3 space-y-2.5 shadow-sm";
+
+          exRow.innerHTML = `
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-bold text-white flex items-center gap-1.5">
+                ${item.name}
+              </span>
+              <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-2 py-0.5 rounded-lg transition">
+                <i class="fa-brands fa-youtube mr-1"></i>Técnica
+              </a>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <div class="bg-slate-950 border border-slate-800 rounded-lg p-2 flex flex-col items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Repeticiones</span>
+                <div class="flex items-center justify-between w-full gap-1">
+                  <button onclick="updateExerciseConfig('${item.name}', 'reps', -1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-90 text-brand-accent font-black flex items-center justify-center transition border border-slate-700">
+                    <i class="fa-solid fa-minus text-xs"></i>
+                  </button>
+                  <div class="flex-1 text-center">
+                    <input type="number" value="${cfg.reps}" min="1" onchange="setExerciseConfigDirect('${item.name}', 'reps', this.value)" class="w-full bg-transparent text-center font-black text-white text-base focus:outline-none focus:text-brand-accent">
+                    <span class="text-[9px] text-slate-500 block -mt-1">reps</span>
+                  </div>
+                  <button onclick="updateExerciseConfig('${item.name}', 'reps', 1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-90 text-brand-accent font-black flex items-center justify-center transition border border-slate-700">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="bg-slate-950 border border-slate-800 rounded-lg p-2 flex flex-col items-center justify-between">
+                <span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Peso (kg)</span>
+                <div class="flex items-center justify-between w-full gap-1">
+                  <button onclick="updateExerciseConfig('${item.name}', 'weight', -${wStep})" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-90 text-emerald-400 font-black flex items-center justify-center transition border border-slate-700">
+                    <i class="fa-solid fa-minus text-xs"></i>
+                  </button>
+                  <div class="flex-1 text-center">
+                    <input type="number" value="${cfg.weight}" min="0" step="${wStep}" onchange="setExerciseConfigDirect('${item.name}', 'weight', this.value)" class="w-full bg-transparent text-center font-black text-white text-base focus:outline-none focus:text-emerald-400">
+                    <span class="text-[9px] text-slate-500 block -mt-1">${cfg.weight === 0 ? 'Corporal' : 'kg'}</span>
+                  </div>
+                  <button onclick="updateExerciseConfig('${item.name}', 'weight', ${wStep})" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-90 text-emerald-400 font-black flex items-center justify-center transition border border-slate-700">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+
+          itemsContainer.appendChild(exRow);
+        });
+
+        groupWrapper.appendChild(itemsContainer);
+        container.appendChild(groupWrapper);
+      });
+    }
+
     function getRandomItem(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    // Devuelve una copia de la lista en orden aleatorio mediante Fisher-Yates.
     function shuffleArray(arr) {
       const array = [...arr];
       for (let i = array.length - 1; i > 0; i--) {
@@ -388,90 +545,10 @@
       return array;
     }
 
-    // Selecciona el esquema de repeticiones según el ejercicio y su categoría.
-    function getRandomRepScheme(categoryKey, exerciseName = '', isPushup = false) {
-      if (isPushup) {
-        const pushupSchemes = [
-          { desc: "4 series x 15 reps", intensity: "Moderado • RIR 2", rest: "60s" },
-          { desc: "4 series x 18 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" },
-          { desc: "4 series x 20 reps", intensity: "Al Fallo • RIR 0-1", rest: "60s" }
-        ];
-        return getRandomItem(pushupSchemes);
-      }
-
-      if (categoryKey === 'legs') {
-        if (exerciseName === 'Sentadilla Goblet') {
-          const gobletSchemes = [
-            { desc: "4 series x 18 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-            { desc: "4 series x 20 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
-            { desc: "4 series x 25 reps", intensity: "Alto Volumen • RIR 0-1", rest: "60s" }
-          ];
-          return getRandomItem(gobletSchemes);
-        }
-        const legSchemes = [
-          { desc: "4 series x 15 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-          { desc: "4 series x 18 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
-          { desc: "4 series x 20 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
-        ];
-        return getRandomItem(legSchemes);
-      }
-
-      if (categoryKey === 'core') {
-        if (exerciseName === 'Rueda Abdominal Excéntrica') {
-          const eccentricSchemes = [
-            { desc: "4 series x 8 reps (3s sostén)", intensity: "Tensión Excéntrica • RIR 1", rest: "60s" },
-            { desc: "4 series x 10 reps (3s sostén)", intensity: "Tensión Excéntrica • RIR 1", rest: "60s" },
-            { desc: "4 series x 12 reps (2s sostén)", intensity: "Máximo Control • RIR 0-1", rest: "60s" }
-          ];
-          return getRandomItem(eccentricSchemes);
-        }
-        const coreSchemes = [
-          { desc: "4 series x 10 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-          { desc: "4 series x 12 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
-          { desc: "4 series x 14 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
-        ];
-        return getRandomItem(coreSchemes);
-      }
-
-      if (exerciseName.includes('Pantorrillas') || categoryKey === 'calves') {
-        const calfSchemes = [
-          { desc: "4 series x 15 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-          { desc: "4 series x 20 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" },
-          { desc: "4 series x 25 reps", intensity: "Al Fallo • RIR 0-1", rest: "60s" }
-        ];
-        return getRandomItem(calfSchemes);
-      }
-
-      if (exerciseName === 'Press Copa') {
-        const pressCopaSchemes = [
-          { desc: "4 series x 15 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-          { desc: "4 series x 18 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
-          { desc: "4 series x 20 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
-        ];
-        return getRandomItem(pressCopaSchemes);
-      }
-
-      if (categoryKey === 'shouldersTriceps' || exerciseName.includes('Press') || exerciseName.includes('Elevaciones')) {
-        const shoulderSchemes = [
-          { desc: "4 series x 8 reps", intensity: "Pesado • RIR 1-2", rest: "60s" },
-          { desc: "4 series x 10 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-          { desc: "4 series x 12 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" }
-        ];
-        return getRandomItem(shoulderSchemes);
-      }
-
-      const standardSchemes = [
-        { desc: "4 series x 12 reps", intensity: "Moderado • RIR 1-2", rest: "60s" },
-        { desc: "4 series x 15 reps", intensity: "Moderado-Alto • RIR 1", rest: "60s" },
-        { desc: "4 series x 18 reps", intensity: "Alto Volumen • RIR 1", rest: "60s" }
-      ];
-      return getRandomItem(standardSchemes);
-    }
-
-    // Escoge un ejercicio que no aparezca en el historial reciente de selección.
+    // Escoge un ejercicio evitando cualquier ejercicio que haya formado parte de la sesión anterior.
     function getNonRepeatingExercise(pool) {
-      const usedInHistory = progState.usedExerciseHistory || [];
-      const available = pool.filter(ex => !usedInHistory.includes(ex.name));
+      const lastSession = progState.lastSessionExercises || [];
+      const available = pool.filter(ex => !lastSession.includes(ex.name));
 
       if (available.length > 0) {
         return getRandomItem(available);
@@ -479,7 +556,6 @@
       return getRandomItem(pool);
     }
 
-    // Solicita confirmación antes de reemplazar una rutina que siga activa.
     function confirmNewWorkout() {
       if (progState.activeWorkout) {
         showModal(
@@ -494,17 +570,15 @@
       }
     }
 
-    // GENERADOR ALEATORIO
-    // Selecciona ejercicios por grupo, calcula sus cargas y prepara los esquemas.
+    // GENERADOR ALEATORIO CON ANTI-REPETICIÓN EN SESIONES CONSECUTIVAS
     function generateRandomWorkout() {
-      // 1. Puesto 1: Piernas
-      const legPool = EXERCISE_DATABASE.legs.filter(ex => ex.name !== progState.lastStartLeg);
-      const legEx = getNonRepeatingExercise(legPool.length > 0 ? legPool : EXERCISE_DATABASE.legs);
-
-      // 2. Puestos 2, 3 y 4 VARIABLES: Pecho, Brazos, Hombro/Tríceps
-      const chestEx = getNonRepeatingExercise(EXERCISE_DATABASE.chest);
-      const armEx = getNonRepeatingExercise(EXERCISE_DATABASE.arms);
-      const shoulderEx = getNonRepeatingExercise(EXERCISE_DATABASE.shouldersTriceps);
+      // Selección garantizada sin repetición con respecto a la sesión inmediatamente anterior
+      const legEx = getNonRepeatingExercise(EXERCISE_DATABASE.legs.items);
+      const chestEx = getNonRepeatingExercise(EXERCISE_DATABASE.chest.items);
+      const armEx = getNonRepeatingExercise(EXERCISE_DATABASE.arms.items);
+      const shoulderEx = getNonRepeatingExercise(EXERCISE_DATABASE.shouldersTriceps.items);
+      const coreEx = getNonRepeatingExercise(EXERCISE_DATABASE.core.items);
+      const calfEx = getNonRepeatingExercise(EXERCISE_DATABASE.calves.items);
 
       const midPool = [
         { type: "Pecho", categoryKey: "chest", ex: chestEx },
@@ -512,10 +586,6 @@
         { type: "Hombro/Tríceps", categoryKey: "shouldersTriceps", ex: shoulderEx }
       ];
       const shuffledMid = shuffleArray(midPool);
-
-      // 3. Puestos 5 y 6 VARIABLES: Core y Pantorrillas
-      const coreEx = getNonRepeatingExercise(EXERCISE_DATABASE.core);
-      const calfEx = getNonRepeatingExercise(EXERCISE_DATABASE.calves);
 
       const endPool = [
         { type: "Core", categoryKey: "core", ex: coreEx },
@@ -532,39 +602,31 @@
         { pos: `Puesto 6 (${shuffledEnd[1].type})`, categoryKey: shuffledEnd[1].categoryKey, ex: shuffledEnd[1].ex }
       ];
 
-      // Actualizar registro histórico de repeticiones
+      // Guardar lista de ejercicios elegidos para evitar repetir el mismo en la próxima sesión
       const selectedNames = fullList.map(item => item.ex.name);
-      progState.lastStartLeg = legEx.name;
-      progState.usedExerciseHistory = [...(progState.usedExerciseHistory || []), ...selectedNames];
-
-      if (progState.usedExerciseHistory.length > 12) {
-        progState.usedExerciseHistory = selectedNames;
-      }
+      progState.lastSessionExercises = selectedNames;
 
       currentWorkoutData = fullList.map(item => {
-        const isPushup = !!item.ex.isPushup;
-        const repScheme = getRandomRepScheme(item.categoryKey, item.ex.name, isPushup);
-        const load = item.ex.getLoad ? item.ex.getLoad() : item.ex.load;
+        const cfg = getExerciseConfig(item.ex.name);
+        const loadText = cfg.weight > 0 ? `Mancuernas / Peso ${cfg.weight} kg` : 'Peso Corporal';
+        const descText = `4 series x ${cfg.reps} reps`;
+
         return {
           pos: item.pos,
           name: item.ex.name,
-          load: load,
+          load: loadText,
           url: item.ex.url,
-          desc: repScheme.desc,
-          intensity: repScheme.intensity,
-          rest: repScheme.rest
+          desc: descText
         };
       });
 
       guidedIndex = 0;
       completedSetsMap = {};
       
-      // Inicializar el arreglo de series completadas (4 por cada ejercicio)
       currentWorkoutData.forEach((_, idx) => {
         completedSetsMap[idx] = [false, false, false, false];
       });
 
-      // GUARDAR RUTINA ACTIVA EN LOCALSTORAGE (Punto 1 completado)
       progState.activeWorkout = {
         date: selectedDate,
         workoutData: currentWorkoutData,
@@ -577,7 +639,6 @@
       renderWorkoutView();
     }
 
-    // Recupera los datos guardados y abre la sesión interrumpida.
     function resumeActiveWorkout() {
       if (!progState.activeWorkout) return;
       
@@ -589,7 +650,6 @@
       renderWorkoutView();
     }
 
-    // Persiste el índice guiado y las series completadas de la sesión activa.
     function saveActiveWorkoutState() {
       if (progState.activeWorkout) {
         progState.activeWorkout.guidedIndex = guidedIndex;
@@ -598,7 +658,6 @@
       }
     }
 
-    // Pide confirmación para descartar la sesión sin añadirla al historial.
     function abandonWorkoutPrompt() {
       showModal(
         "¿Descartar sesión?",
@@ -612,7 +671,6 @@
       );
     }
 
-    // Forma el título de sesión a partir de la fecha elegida.
     function getSessionTitleForDate(dateStr) {
       if (!dateStr) return "Sesión";
       const [year, month, day] = dateStr.split('-');
@@ -622,7 +680,6 @@
       return `Sesión ${capitalizedDay}`;
     }
 
-    // Cambia a la sesión activa y dibuja sus vistas guiada y de lista.
     function renderWorkoutView() {
       const titleName = getSessionTitleForDate(selectedDate);
       document.getElementById('workout-session-title').innerText = titleName;
@@ -638,21 +695,17 @@
       window.scrollTo(0, 0);
     }
 
-    // RENDERIZADO DEL MODO GUIADO (EJERCICIO A EJERCICIO)
-    // Renderiza la tarjeta del ejercicio actual, sus series y el avance guiado.
     function renderGuidedExercise() {
       if (!currentWorkoutData || currentWorkoutData.length === 0) return;
 
       const totalEx = currentWorkoutData.length;
       const current = currentWorkoutData[guidedIndex];
 
-      // Actualizar indicadores de progreso
       document.getElementById('guided-step-text').innerText = `Ejercicio ${guidedIndex + 1} de ${totalEx}`;
       const pct = Math.round(((guidedIndex + 1) / totalEx) * 100);
       document.getElementById('guided-step-percent').innerText = `${pct}%`;
       document.getElementById('guided-progress-bar').style.width = `${pct}%`;
 
-      // Habilitar / deshabilitar botones de navegación
       document.getElementById('btn-prev-ex').disabled = (guidedIndex === 0);
       
       const nextBtn = document.getElementById('btn-next-ex');
@@ -664,7 +717,6 @@
         nextBtn.className = "flex-1 bg-brand-500 hover:bg-brand-600 text-slate-950 py-3.5 rounded-xl text-sm font-black transition flex items-center justify-center gap-2 active:scale-95 shadow-lg shadow-brand-500/20";
       }
 
-      // Renderizar Tarjeta de Ejercicio
       const card = document.getElementById('guided-exercise-card');
       const setsState = completedSetsMap[guidedIndex] || [false, false, false, false];
 
@@ -684,12 +736,8 @@
       }
 
       card.innerHTML = `
-        <div class="flex justify-between items-center border-b border-slate-800 pb-2.5">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
           <span class="text-xs font-black text-brand-accent uppercase tracking-wider">${current.pos}</span>
-          <span class="text-[11px] bg-slate-950 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-800 font-medium flex items-center gap-1.5">
-            <i class="fa-regular fa-clock text-brand-accent"></i>
-            Descanso sugerido: <strong class="text-white">${current.rest}</strong>
-          </span>
         </div>
 
         <div class="flex justify-between items-start gap-2 pt-1">
@@ -706,21 +754,13 @@
           </a>
         </div>
 
-        <!-- Indicador de Repeticiones y Esfuerzo -->
         <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
           <div>
             <span class="text-[10px] uppercase font-semibold text-slate-500 block">Esquema</span>
             <span class="font-bold text-white text-sm"><i class="fa-solid fa-bullseye text-brand-500 mr-1.5"></i>${current.desc}</span>
           </div>
-          <div class="text-right">
-            <span class="text-[10px] uppercase font-semibold text-slate-500 block">Intensidad</span>
-            <span class="text-[11px] bg-brand-500/10 text-brand-accent px-2.5 py-0.5 rounded-full font-bold border border-brand-500/20 inline-block">
-              ${current.intensity}
-            </span>
-          </div>
         </div>
 
-        <!-- Rastreador de Series -->
         <div class="space-y-1.5 pt-1">
           <div class="flex justify-between items-center">
             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Marcador de Series</span>
@@ -733,7 +773,6 @@
       `;
     }
 
-    // Marca o desmarca una serie y persiste el avance de la sesión.
     function toggleSetDone(exIdx, setIdx) {
       if (!completedSetsMap[exIdx]) {
         completedSetsMap[exIdx] = [false, false, false, false];
@@ -743,7 +782,6 @@
       renderGuidedExercise();
     }
 
-    // Cambia al ejercicio anterior o siguiente y finaliza al llegar al último.
     function navigateGuidedExercise(direction) {
       const newIdx = guidedIndex + direction;
       if (newIdx >= 0 && newIdx < currentWorkoutData.length) {
@@ -755,7 +793,6 @@
       }
     }
 
-    // Alterna entre la presentación guiada y la lista completa de ejercicios.
     function toggleWorkoutDisplayMode() {
       isListView = !isListView;
       const guidedCont = document.getElementById('guided-mode-container');
@@ -773,21 +810,17 @@
       }
     }
 
-    // Construye las tarjetas de todos los ejercicios de la rutina actual.
     function renderWorkoutList() {
       const container = document.getElementById('workout-list');
       container.innerHTML = '';
 
-      currentWorkoutData.forEach((item, idx) => {
+      currentWorkoutData.forEach((item) => {
         const card = document.createElement('div');
         card.className = "bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-2.5 shadow-sm";
         
         card.innerHTML = `
           <div class="flex justify-between items-center">
             <span class="text-xs font-black text-brand-accent uppercase tracking-wider">${item.pos}</span>
-            <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full border border-slate-700 font-medium">
-              <i class="fa-regular fa-clock mr-1"></i>${item.rest}
-            </span>
           </div>
 
           <div class="flex justify-between items-start gap-2">
@@ -807,18 +840,12 @@
             <div class="text-slate-200 font-semibold">
               <i class="fa-solid fa-bullseye text-brand-500 mr-1.5"></i>${item.desc}
             </div>
-            <span class="text-[10px] bg-brand-500/10 text-brand-accent px-2 py-0.5 rounded-full font-bold border border-brand-500/20">
-              ${item.intensity}
-            </span>
           </div>
         `;
         container.appendChild(card);
       });
     }
 
-    // Emite el patrón existente de tonos y vibración cuando termina el descanso.
-    // TEMPORIZADOR POTENTE Y MULTI-PITIDO (5 SEGUNDOS, ALTO VOLUMEN, NO INTERRUMPE MÚSICA)
-    // Programa el audio de aviso y conserva el patrón de vibración configurado.
     function playSubtleTimerBeep() {
       try {
         if (!audioCtx) {
@@ -829,21 +856,19 @@
         }
 
         const now = audioCtx.currentTime;
-        // Secuencia de 5 pitidos dobles agudos distanciados por 1.1s (dura 5 segundos en total)
         const beepSchedule = [0, 1.1, 2.2, 3.3, 4.4];
 
         beepSchedule.forEach(offset => {
           const startTime = now + offset;
 
-          // Tono 1: Oscilador con forma de onda triangular (penetra la música con nitidez)
           const osc1 = audioCtx.createOscillator();
           const gain1 = audioCtx.createGain();
           osc1.type = 'triangle';
-          osc1.frequency.setValueAtTime(880, startTime); // A5
-          osc1.frequency.exponentialRampToValueAtTime(1320, startTime + 0.15); // Sweep hacia E6
+          osc1.frequency.setValueAtTime(880, startTime);
+          osc1.frequency.exponentialRampToValueAtTime(1320, startTime + 0.15);
 
           gain1.gain.setValueAtTime(0.001, startTime);
-          gain1.gain.linearRampToValueAtTime(0.65, startTime + 0.03); // Volumen incrementado
+          gain1.gain.linearRampToValueAtTime(0.65, startTime + 0.03);
           gain1.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
 
           osc1.connect(gain1);
@@ -852,7 +877,6 @@
           osc1.start(startTime);
           osc1.stop(startTime + 0.35);
 
-          // Tono 2: Eco/Chime Armónico Agudo (C#6)
           const osc2 = audioCtx.createOscillator();
           const gain2 = audioCtx.createGain();
           osc2.type = 'sine';
@@ -870,16 +894,14 @@
         });
 
       } catch (e) {
-        // Fallback silencioso si no hay soporte de audio
+        // Fallback silencioso si no hay soporte de Web Audio
       }
 
-      // Patrón de vibración rítmica en 5 ráfagas sincronizadas durante los 5 segundos
       if ("vibrate" in navigator) {
         navigator.vibrate([250, 850, 250, 850, 250, 850, 250, 850, 350]);
       }
     }
 
-    // Inicia el descanso y calcula su fin usando el reloj del sistema, no decrementos del intervalo.
     function startTimer(seconds, label = 'Descanso') {
       clearInterval(timerInterval);
       releaseWakeLock();
@@ -889,7 +911,6 @@
       timerEndTime = Date.now() + seconds * 1000;
       isTimerPaused = false;
 
-      // El gesto del usuario permite preparar el audio para el aviso final.
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
       } else if (audioCtx.state === 'suspended') {
@@ -906,7 +927,6 @@
       timerInterval = setInterval(updateTimerFromTimestamp, 250);
     }
 
-    // Solicita mantener la pantalla encendida; la falta de soporte no afecta el cronómetro.
     async function requestWakeLock() {
       if (!navigator.wakeLock || !navigator.wakeLock.request) return;
       try {
@@ -920,7 +940,6 @@
       }
     }
 
-    // Libera el bloqueo de pantalla al pausar, reiniciar o completar el descanso.
     function releaseWakeLock() {
       if (!wakeLockSentinel) return;
       const sentinel = wakeLockSentinel;
@@ -928,7 +947,6 @@
       sentinel.release().catch(error => console.warn('No se pudo liberar el bloqueo de pantalla:', error));
     }
 
-    // Sincroniza el contador con Date.now() y finaliza incluso si el navegador suspendió el intervalo.
     function updateTimerFromTimestamp() {
       if (isTimerPaused || timerEndTime === null) return;
       const remaining = Math.max(0, Math.ceil((timerEndTime - Date.now()) / 1000));
@@ -944,12 +962,10 @@
       }
     }
 
-    // Al volver a la pestaña, actualiza enseguida el tiempo o completa el aviso vencido.
     document.addEventListener('visibilitychange', () => {
       if (!document.hidden && !isTimerPaused && timerEndTime !== null) updateTimerFromTimestamp();
     });
 
-    // Refleja en pantalla el tiempo restante y el estado visual del contador.
     function updateTimerUI() {
       const minutes = Math.floor(timerSecondsLeft / 60);
       const secs = timerSecondsLeft % 60;
@@ -969,7 +985,6 @@
       }
     }
 
-    // Pausa guardando los segundos restantes o reanuda creando una nueva marca de fin.
     function pauseOrResumeTimer() {
       if (timerSecondsLeft <= 0) return;
       isTimerPaused = !isTimerPaused;
@@ -994,7 +1009,6 @@
       }
     }
 
-    // Restablece la interfaz y cancela el intervalo, la marca de tiempo y el Wake Lock.
     function resetTimer() {
       clearInterval(timerInterval);
       timerInterval = null;
@@ -1013,7 +1027,6 @@
       document.getElementById('timer-display-box').classList.remove('timer-active', 'border-brand-500/50', 'bg-brand-950/20', 'border-emerald-500/50', 'bg-emerald-950/30');
     }
 
-    // Ejecuta una sola vez los avisos de sonido/vibración y muestra el estado completado.
     function onTimerComplete() {
       clearInterval(timerInterval);
       timerInterval = null;
@@ -1039,8 +1052,6 @@
       }, 5000);
     }
 
-    // COMPLETAR ENTRENAMIENTO Y GUARDAR EN HISTORIAL
-    // Cierra la rutina actual, registra la sesión y vuelve al panel principal.
     function completeWorkout() {
       const titleName = getSessionTitleForDate(selectedDate);
 
@@ -1052,7 +1063,7 @@
       };
       
       progState.history.push(entry);
-      progState.activeWorkout = null; // Limpiar la rutina activa al completar
+      progState.activeWorkout = null;
       saveState();
 
       resetTimer();
@@ -1060,7 +1071,6 @@
       renderHistory();
     }
 
-    // Dibuja el historial reciente y prepara las acciones para eliminar registros.
     function renderHistory() {
       const historyList = document.getElementById('history-list');
       const historyCount = document.getElementById('history-count');
@@ -1098,14 +1108,12 @@
       });
     }
 
-    // Elimina del almacenamiento local una sesión del historial.
     function deleteHistoryEntry(id) {
       progState.history = progState.history.filter(item => item.id !== id);
       saveState();
       renderHistory();
     }
 
-    // Mantiene el banner sincronizado con el progreso de la sesión guardada.
     function updateBannerStatus() {
       const banner = document.getElementById('active-session-banner');
       const bannerInfo = document.getElementById('active-banner-info');
@@ -1121,7 +1129,6 @@
       }
     }
 
-    // Muestra el panel principal y actualiza el aviso de sesión activa.
     function showDashboard() {
       document.getElementById('view-workout').classList.add('hidden');
       document.getElementById('view-progression').classList.add('hidden');
@@ -1131,11 +1138,10 @@
       window.scrollTo(0, 0);
     }
 
-    // Alterna entre el panel principal y la configuración de cargas.
     function toggleView() {
       const progView = document.getElementById('view-progression');
       if (progView.classList.contains('hidden')) {
-        updateProgressionView();
+        renderProgressionView();
         document.getElementById('view-dashboard').classList.add('hidden');
         document.getElementById('view-workout').classList.add('hidden');
         progView.classList.remove('hidden');
@@ -1145,38 +1151,6 @@
       }
     }
 
-    // Guarda el peso elegido y refresca los botones seleccionados.
-    function setWeight(type, value) {
-      progState.weights[type] = value;
-      saveState();
-      updateProgressionView();
-    }
-
-    // Resalta las cargas activas de cada ejercicio en la vista de progresión.
-    function updateProgressionView() {
-      ['15', '20', '25'].forEach(w => {
-        const btn = document.getElementById(`w-press-${w}`);
-        if (btn) btn.className = (progState.weights.press === `${w} kg`)
-          ? "p-2.5 text-xs rounded-xl border border-brand-500 bg-brand-500/10 text-brand-accent font-bold"
-          : "p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-bold";
-      });
-
-      ['10', '15', '20'].forEach(w => {
-        const btn = document.getElementById(`w-elev-${w}`);
-        if (btn) btn.className = (progState.weights.elevaciones === `${w} kg`)
-          ? "p-2.5 text-xs rounded-xl border border-brand-500 bg-brand-500/10 text-brand-accent font-bold"
-          : "p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-bold";
-      });
-
-      ['20', '25', '30'].forEach(w => {
-        const btn = document.getElementById(`w-pressCopa-${w}`);
-        if (btn) btn.className = (progState.weights.pressCopa === `${w} kg`)
-          ? "p-2.5 text-xs rounded-xl border border-brand-500 bg-brand-500/10 text-brand-accent font-bold"
-          : "p-2.5 text-xs rounded-xl border border-slate-800 bg-slate-950 text-slate-400 font-bold";
-      });
-    }
-
-    // Actualiza la fecha elegida y su etiqueta legible en pantalla.
     function updateDateDisplay(val) {
       if (!val) return;
       selectedDate = val;
@@ -1188,7 +1162,6 @@
 
     // UTILERÍA MODAL PERSONALIZADA
     let modalConfirmCallback = null;
-    // Configura el diálogo reutilizable y la acción asociada a su confirmación.
     function showModal(title, message, onConfirm) {
       document.getElementById('modal-title').innerText = title;
       document.getElementById('modal-message').innerText = message;
@@ -1203,13 +1176,11 @@
       document.getElementById('modal-backdrop').classList.remove('hidden');
     }
 
-    // Oculta el diálogo y descarta su acción pendiente.
     function closeModal() {
       document.getElementById('modal-backdrop').classList.add('hidden');
       modalConfirmCallback = null;
     }
 
-    // Inicializa fecha, historial, progresión y recuperación de la sesión activa.
     window.onload = function() {
       const today = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('input-date');
@@ -1218,9 +1189,8 @@
       }
       updateDateDisplay(today);
       renderHistory();
-      updateProgressionView();
+      renderProgressionView();
 
-      // RECUPERAR SESIÓN ACTIVA AL RECARGAR (Punto 1)
       if (progState.activeWorkout && progState.activeWorkout.workoutData) {
         resumeActiveWorkout();
       } else {
