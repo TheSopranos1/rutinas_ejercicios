@@ -351,20 +351,20 @@
           { name: "Press Copa", defaultReps: 10, defaultWeight: 25, url: "https://www.youtube.com/shorts/GCf-uePkG8k" }
         ]
       },
-      core: {
-        title: "Core",
-        icon: "fa-solid fa-arrows-spin",
-        items: [
-          { name: "Rueda Abdominal", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/lhYSUUWaFEU" },
-          { name: "Rueda Abdominal Excéntrica", defaultReps: 8, defaultWeight: 0, url: "https://www.youtube.com/shorts/U1itoMMI8CY" }
-        ]
-      },
       calves: {
         title: "Pantorrillas",
         icon: "fa-solid fa-shoe-prints",
         items: [
           { name: "Pantorrillas Unilateral", defaultReps: 20, defaultWeight: 25, url: "https://www.youtube.com/shorts/fKt3Q0peC0Y" },
           { name: "Pantorrillas Bilateral", defaultReps: 15, defaultWeight: 45, url: "https://www.youtube.com/shorts/_5W3WPS1bGU" }
+        ]
+      },
+      core: {
+        title: "Core",
+        icon: "fa-solid fa-arrows-spin",
+        items: [
+          { name: "Rueda Abdominal", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/lhYSUUWaFEU" },
+          { name: "Rueda Abdominal Excéntrica", defaultReps: 8, defaultWeight: 0, url: "https://www.youtube.com/shorts/U1itoMMI8CY" }
         ]
       }
     };
@@ -453,7 +453,7 @@
       if (!container) return;
 
       container.innerHTML = '';
-      const groupKeys = ['legs', 'chest', 'arms', 'shouldersTriceps', 'core', 'calves'];
+      const groupKeys = ['legs', 'chest', 'arms', 'shouldersTriceps', 'calves', 'core'];
 
       groupKeys.forEach(groupKey => {
         const group = EXERCISE_DATABASE[groupKey];
@@ -577,8 +577,8 @@
       const chestEx = getNonRepeatingExercise(EXERCISE_DATABASE.chest.items);
       const armEx = getNonRepeatingExercise(EXERCISE_DATABASE.arms.items);
       const shoulderEx = getNonRepeatingExercise(EXERCISE_DATABASE.shouldersTriceps.items);
-      const coreEx = getNonRepeatingExercise(EXERCISE_DATABASE.core.items);
       const calfEx = getNonRepeatingExercise(EXERCISE_DATABASE.calves.items);
+      const coreEx = getNonRepeatingExercise(EXERCISE_DATABASE.core.items);
 
       const midPool = [
         { type: "Pecho", categoryKey: "chest", ex: chestEx },
@@ -587,19 +587,15 @@
       ];
       const shuffledMid = shuffleArray(midPool);
 
-      const endPool = [
-        { type: "Core", categoryKey: "core", ex: coreEx },
-        { type: "Pantorrillas", categoryKey: "calves", ex: calfEx }
-      ];
-      const shuffledEnd = shuffleArray(endPool);
-
+      // Puesto 1: Piernas | Puestos 2, 3, 4: Pecho, Brazos, Hombro/Tríceps (Alternados)
+      // Puesto 5: Pantorrillas (Fijo) | Puesto 6: Core / Rueda Abdominal (Fijo)
       const fullList = [
         { pos: "Puesto 1 (Piernas)", categoryKey: "legs", ex: legEx },
         { pos: `Puesto 2 (${shuffledMid[0].type})`, categoryKey: shuffledMid[0].categoryKey, ex: shuffledMid[0].ex },
         { pos: `Puesto 3 (${shuffledMid[1].type})`, categoryKey: shuffledMid[1].categoryKey, ex: shuffledMid[1].ex },
         { pos: `Puesto 4 (${shuffledMid[2].type})`, categoryKey: shuffledMid[2].categoryKey, ex: shuffledMid[2].ex },
-        { pos: `Puesto 5 (${shuffledEnd[0].type})`, categoryKey: shuffledEnd[0].categoryKey, ex: shuffledEnd[0].ex },
-        { pos: `Puesto 6 (${shuffledEnd[1].type})`, categoryKey: shuffledEnd[1].categoryKey, ex: shuffledEnd[1].ex }
+        { pos: "Puesto 5 (Pantorrillas)", categoryKey: "calves", ex: calfEx },
+        { pos: "Puesto 6 (Core)", categoryKey: "core", ex: coreEx }
       ];
 
       // Guardar lista de ejercicios elegidos para evitar repetir el mismo en la próxima sesión
