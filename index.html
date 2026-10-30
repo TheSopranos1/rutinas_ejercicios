@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Rutinas</title>
+  <title>Rutinas Calistenia & Objetivos</title>
   <!-- Favicon Emoji -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💪🏽</text></svg>">
   
@@ -47,7 +47,6 @@
       top: 0;
       width: auto;
     }
-    /* Quitar flechas por defecto en inputs numericos */
     input[type=number]::-webkit-inner-spin-button, 
     input[type=number]::-webkit-outer-spin-button { 
       -webkit-appearance: none; 
@@ -56,7 +55,6 @@
     input[type=number] {
       -moz-appearance: textfield;
     }
-    /* Pulse animation for active timer */
     @keyframes pulse-ring {
       0% { transform: scale(0.95); opacity: 0.8; }
       50% { transform: scale(1.03); opacity: 1; }
@@ -75,19 +73,15 @@
         <div class="bg-brand-500 text-slate-950 p-2 rounded-lg font-black text-xl leading-none">💪🏽</div>
         <div>
           <h1 class="text-lg font-bold tracking-tight text-white leading-none">Rutinas</h1>
-          <span id="header-subtitle" class="text-[12px] text-brand-accent font-semibold">Entrenamientos</span>
         </div>
       </div>
-      <button onclick="toggleView()" id="nav-btn" class="text-xs bg-slate-800 hover:bg-slate-700 text-brand-accent px-3.5 py-2 rounded-lg border border-slate-700 font-bold transition flex items-center gap-2">
-        <i class="fa-solid fa-sliders"></i>
-        <span>Progresión</span>
-      </button>
+      <div id="nav-btn" class="hidden"></div>
     </div>
   </header>
 
   <main class="max-w-md mx-auto w-full p-4 flex-1">
 
-    <!-- Banner de Sesión en Curso cuando se está en Dashboard -->
+    <!-- Banner de Sesión en Curso -->
     <div id="active-session-banner" class="hidden mb-4 bg-gradient-to-r from-brand-900/80 to-slate-900 border border-brand-500/40 rounded-2xl p-4 shadow-lg flex items-center justify-between">
       <div>
         <div class="flex items-center gap-2 mb-1">
@@ -97,7 +91,7 @@
           </span>
           <span class="text-xs font-black uppercase text-brand-accent tracking-wider">Sesión en Curso</span>
         </div>
-        <p id="active-banner-info" class="text-xs text-slate-300 font-medium">Ejemplo de rutina</p>
+        <p id="active-banner-info" class="text-xs text-slate-300 font-medium">Cargando...</p>
       </div>
       <button onclick="resumeActiveWorkout()" class="bg-brand-500 hover:bg-brand-600 text-slate-950 px-3.5 py-2 rounded-xl text-xs font-black shadow-md transition flex items-center gap-1.5 active:scale-95">
         <span>Continuar</span>
@@ -120,11 +114,15 @@
         </div>
       </div>
 
-      <!-- Generador de Sesión -->
+      <!-- Indicador de Próxima Sesión -->
       <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3 shadow-sm">
-        <button onclick="confirmNewWorkout()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-black py-4 rounded-xl text-base shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition active:scale-[0.98]">
-          <i class="fa-solid fa-dice text-lg"></i>
-          <span>GENERAR SESIÓN ALEATORIA</span>
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Siguiente Entrenamiento</span>
+        </div>
+        
+        <button onclick="confirmNextWorkout()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-black py-4 rounded-xl text-base shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition active:scale-[0.98]">
+          <i class="fa-solid fa-play text-lg"></i>
+          <span>GENERAR MI ENTRENAMIENTO</span>
         </button>
       </div>
 
@@ -144,7 +142,6 @@
     <!-- VISTA SESIÓN: ENTRENAMIENTO ACTIVO Y GUIADO -->
     <section id="view-workout" class="hidden space-y-4">
       
-      <!-- Resumen y Controles de la Sesión Activa -->
       <div class="bg-slate-900 rounded-2xl p-3.5 border border-slate-800 flex justify-between items-center">
         <div>
           <span id="workout-session-title" class="text-base font-black text-brand-accent">Sesión</span>
@@ -160,10 +157,9 @@
         </div>
       </div>
 
-      <!-- MODO GUIADO: UNO A UNO (EJERCICIO POR EJERCICIO) -->
+      <!-- MODO GUIADO -->
       <div id="guided-mode-container" class="space-y-4">
         
-        <!-- Indicador de Progreso del Entrenamiento -->
         <div class="bg-slate-900 rounded-2xl p-3 border border-slate-800 space-y-1.5">
           <div class="flex justify-between text-xs font-bold">
             <span id="guided-step-text" class="text-slate-300">Ejercicio 1 de 6</span>
@@ -179,7 +175,7 @@
           <!-- Contenido inyectado dinámicamente -->
         </div>
 
-        <!-- SECCIÓN TEMPORIZADOR INTEGRADO -->
+        <!-- SECCIÓN TEMPORIZADOR INTEGRADO (1 MINUTO Y 2 MINUTOS PRESET) -->
         <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3 shadow-md">
           <div class="flex justify-between items-center border-b border-slate-800 pb-2">
             <div class="flex items-center gap-2">
@@ -192,18 +188,21 @@
           <!-- Display digital del temporizador -->
           <div id="timer-display-box" class="bg-slate-950 border border-slate-800 rounded-xl p-3 text-center transition-all">
             <div id="timer-clock" class="text-3xl font-black font-mono tracking-wider text-slate-200">00:00</div>
-            <p id="timer-label" class="text-[11px] text-slate-500 font-medium mt-0.5">Selecciona el descanso</p>
+            <p id="timer-label" class="text-[11px] text-slate-500 font-medium mt-0.5">Pulsa para descansar</p>
           </div>
 
-          <!-- Botón de Presets de Tiempo (1 minuto) -->
-          <div class="w-full">
-            <button onclick="startTimer(60, 'Descanso entre series')" class="w-full bg-slate-950 hover:bg-slate-800 border border-brand-500/40 text-brand-accent py-3 px-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition active:scale-95 shadow-sm">
+          <!-- Presets de Tiempo -->
+          <div class="grid grid-cols-2 gap-2 w-full">
+            <button onclick="startTimer(60, 'Descanso 1 min')" class="bg-slate-950 hover:bg-slate-800 border border-brand-500/40 text-brand-accent py-3 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
               <i class="fa-solid fa-hourglass-half text-brand-500"></i>
-              <span>1 MINUTO DE DESCANSO</span>
+              <span>1 MINUTO</span>
+            </button>
+            <button onclick="startTimer(120, 'Descanso 2 min')" class="bg-slate-950 hover:bg-slate-800 border border-brand-500/40 text-brand-accent py-3 px-2 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow-sm">
+              <i class="fa-solid fa-hourglass text-brand-500"></i>
+              <span>2 MINUTOS</span>
             </button>
           </div>
 
-          <!-- Controles del Temporizador (Pausar/Cancelar) -->
           <div id="timer-controls" class="flex gap-2 hidden pt-1">
             <button onclick="pauseOrResumeTimer()" id="timer-pause-btn" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white py-2 rounded-lg text-xs font-bold transition">
               <i class="fa-solid fa-pause mr-1"></i>Pausar
@@ -214,7 +213,6 @@
           </div>
         </div>
 
-        <!-- Botones de Navegación de Ejercicios -->
         <div class="flex gap-3 pt-2">
           <button onclick="navigateGuidedExercise(-1)" id="btn-prev-ex" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-3.5 rounded-xl text-sm font-bold transition flex items-center justify-center gap-2 active:scale-95 border border-slate-700 disabled:opacity-30 disabled:pointer-events-none">
             <i class="fa-solid fa-chevron-left"></i>
@@ -228,14 +226,13 @@
 
       </div>
 
-      <!-- MODO VISTA LISTA COMPLETA -->
+      <!-- MODO VISTA LISTA -->
       <div id="list-mode-container" class="hidden space-y-3.5">
         <div id="workout-list" class="space-y-3.5">
           <!-- Tarjetas cargadas por JS -->
         </div>
       </div>
 
-      <!-- Controles de Finalización / Reset -->
       <div class="pt-4 space-y-2">
         <button onclick="abandonWorkoutPrompt()" class="w-full bg-transparent hover:bg-rose-500/10 text-rose-400/80 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
           <i class="fa-solid fa-trash-can"></i>
@@ -245,39 +242,34 @@
 
     </section>
 
-    <!-- VISTA CONFIGURACIÓN: PROGRESIÓN DE EJERCICIOS COMPLETA -->
+    <!-- VISTA ÁRBOLES DE HABILIDAD -->
     <section id="view-progression" class="hidden space-y-5">
       <div class="bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-800 space-y-4 shadow-sm">
         <div class="flex justify-between items-start">
           <div>
             <h2 class="text-lg font-bold text-white flex items-center gap-2">
-              <i class="fa-solid fa-sliders text-brand-accent"></i>
-              <span>Progresión de Ejercicios</span>
+              <i class="fa-solid fa-trophy text-amber-400"></i>
+              <span>Árbol de Habilidades</span>
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Lista completa por grupo muscular. Ajusta las <strong class="text-brand-accent">repeticiones (1 en 1)</strong> y el <strong class="text-brand-accent">peso (según el ejercicio)</strong>.
+              Supera los hitos de cada nivel para desbloquear nuevos ejercicios en tus entrenamientos.
             </p>
           </div>
         </div>
 
-        <!-- Contenedor dinámico de lista de ejercicios ordenados por grupo -->
-        <div id="progression-exercise-list" class="space-y-5 pt-2">
-          <!-- Inyectado mediante JS -->
+        <div id="skills-tree-list" class="space-y-5 pt-2">
+          <!-- Árbol inyectado por JS -->
         </div>
 
-        <!-- Botones de acción final -->
         <div class="sticky bottom-4 pt-2 bg-slate-900/95 backdrop-blur-sm border-t border-slate-800 flex gap-2">
-          <button onclick="resetProgressionDefaults()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-4 py-3.5 rounded-xl text-xs transition border border-slate-700">
-            Restablecer
-          </button>
-          <button onclick="showDashboard()" class="flex-1 bg-brand-500 hover:bg-brand-600 text-slate-950 font-black py-3.5 rounded-xl text-sm transition shadow-lg shadow-brand-500/20 active:scale-95">
-            Guardar y Volver
+          <button onclick="showDashboard()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-black py-3.5 rounded-xl text-sm transition shadow-lg shadow-brand-500/20 active:scale-95">
+            Volver al Inicio
           </button>
         </div>
       </div>
     </section>
 
-    <!-- Modal de Confirmación personalizado -->
+    <!-- Modal Personalizado -->
     <div id="modal-backdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-xs w-full space-y-4 shadow-2xl">
         <div class="text-center">
@@ -301,7 +293,7 @@
     let selectedDate = new Date().toISOString().split('T')[0];
     let currentWorkoutData = [];
     let guidedIndex = 0;
-    let completedSetsMap = {}; // { exerciseIndex: [true, false, ...] }
+    let completedSetsMap = {};
     let isListView = false;
 
     // ESTADO DEL TEMPORIZADOR
@@ -314,321 +306,216 @@
     let isTimerPaused = false;
     let audioCtx = null;
 
-    // BASE DE DATOS DE EJERCICIOS ACTUALIZADA
-    const EXERCISE_DATABASE = {
-      legs: {
-        title: "Piernas",
-        icon: "fa-solid fa-person-running",
-        items: [
-          { name: "Sentadilla Frontal", defaultReps: 10, defaultWeight: 45, url: "https://www.youtube.com/shorts/BCGKtZ0fCiI" },
-          { name: "Sentadilla Sumo", defaultReps: 10, defaultWeight: 45, url: "https://www.youtube.com/shorts/PYOWcPYckvg" }
+    // DEFINICIÓN DE ÁRBOLES DE HABILIDADES Y OBJETIVOS
+    const SKILL_TREES = {
+      muscleUp: {
+        title: "Objetivo: Muscle Up",
+        badgeColor: "text-amber-400",
+        levels: [
+          {
+            level: 1,
+            name: "Fase 1: Base Estricta de Tracción",
+            unlocked: true,
+            reqText: "Logra 10 reps en Dominadas y 12 reps en Fondos en una misma sesión para desbloquear.",
+            exercises: [
+              { name: "Dominadas Estrictas", load: "Peso Corporal", isTime: false, targetReps: 10, url: "https://www.youtube.com/shorts/MPbRERVWkbg", desc: "4 series x Máximas reps" },
+              { name: "Fondos", load: "Peso Corporal", isTime: false, targetReps: 12, url: "https://www.youtube.com/shorts/s5BLhbKWD3E", desc: "4 series x Máximas reps" }
+            ]
+          },
+          {
+            level: 2,
+            name: "Fase 2: Potencia Explosiva y Transición",
+            unlocked: false,
+            reqText: "Logra 6 reps Explosivas y 5 Negativas lentas para desbloquear el nivel final.",
+            exercises: [
+              { name: "Dominadas Explosivas", load: "Peso Corporal", isTime: false, targetReps: 6, url: "https://www.youtube.com/shorts/HnGH_yr80cw", desc: "4 series x Máximas reps" },
+              { name: "Muscle Up Negativo con Salto", load: "Peso Corporal", isTime: false, targetReps: 5, url: "https://www.youtube.com/shorts/xNRM4tEUtDA", desc: "4 series x Máximas reps (>4s bajada)" }
+            ]
+          },
+          {
+            level: 3,
+            name: "Fase 3: Muscle Up Completo",
+            unlocked: false,
+            reqText: "¡Habilidad máxima desbloqueada! Ejecuta y consolida la técnica.",
+            exercises: [
+              { name: "Muscle Up Estricto / Asistido", load: "Peso Corporal", isTime: false, targetReps: 1, url: "https://www.youtube.com/shorts/oHdMd7RPUt4", desc: "4 series x Máximas reps" }
+            ]
+          }
         ]
       },
-      chest: {
-        title: "Pecho",
-        icon: "fa-solid fa-child-reaching",
-        items: [
-          { name: "Flexiones Normales", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/3ljNPWHv1x4", isPushup: true },
-          { name: "Flexiones Declinadas", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/5Nm2wr3CgNA", isPushup: true },
-          { name: "Flexiones Diamante", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/UWmWbpIeBVI", isPushup: true }
-        ]
-      },
-      arms: {
-        title: "Brazos",
-        icon: "fa-solid fa-dumbbell",
-        items: [
-          { name: "Curl Bíceps", defaultReps: 10, defaultWeight: 45, url: "https://www.youtube.com/shorts/WrpQYs_n_Pw" },
-          { name: "Curl Martillo", defaultReps: 10, defaultWeight: 45, url: "https://www.youtube.com/shorts/QdEY-VZcPMU" },
-          { name: "Curl Concentrado", defaultReps: 10, defaultWeight: 25, url: "https://www.youtube.com/shorts/JM6T3kun48k" }
-        ]
-      },
-      shouldersTriceps: {
-        title: "Hombro y Tríceps",
-        icon: "fa-solid fa-hand-fist",
-        items: [
-          { name: "Press Militar", defaultReps: 10, defaultWeight: 20, url: "https://www.youtube.com/shorts/i5cvgQveFbY" },
-          { name: "Elevaciones Laterales", defaultReps: 10, defaultWeight: 10, url: "https://www.youtube.com/shorts/t9Cb4hLuGfE" },
-          { name: "Press Copa", defaultReps: 10, defaultWeight: 25, url: "https://www.youtube.com/shorts/GCf-uePkG8k" }
-        ]
-      },
-      calves: {
-        title: "Pantorrillas",
-        icon: "fa-solid fa-shoe-prints",
-        items: [
-          { name: "Pantorrillas Unilateral", defaultReps: 20, defaultWeight: 25, url: "https://www.youtube.com/shorts/fKt3Q0peC0Y" },
-          { name: "Pantorrillas Bilateral", defaultReps: 15, defaultWeight: 45, url: "https://www.youtube.com/shorts/_5W3WPS1bGU" }
-        ]
-      },
-      core: {
-        title: "Core",
-        icon: "fa-solid fa-arrows-spin",
-        items: [
-          { name: "Rueda Abdominal", defaultReps: 10, defaultWeight: 0, url: "https://www.youtube.com/shorts/lhYSUUWaFEU" }
+      handstand: {
+        title: "Objetivo: El Pino / Handstand",
+        badgeColor: "text-sky-400",
+        levels: [
+          {
+            level: 1,
+            name: "Fase 1: Fuerza de Hombro y Tríceps",
+            unlocked: true,
+            reqText: "Logra 10 reps en Flexiones en Pica para desbloquear la segunda fase.",
+            exercises: [
+              { name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, targetReps: 10, url: "https://www.youtube.com/shorts/6esmbGzzF6w", desc: "4 series x Máximas reps" }
+            ]
+          },
+          {
+            level: 2,
+            name: "Fase 2: Postura Isométrica y Soporte",
+            unlocked: false,
+            reqText: "Consigue 15s en Enanito y 30s de Pino en Pared para desbloquear el Pino Libre.",
+            exercises: [
+              { name: "Agarre Enanito (Frog Stand)", load: "Peso Corporal", isTime: true, targetReps: 15, url: "https://www.youtube.com/shorts/fCc9UB0LuHk", desc: "4 series x Máximos segundos" },
+              { name: "Pino en Pared (Chest-to-Wall)", load: "Peso Corporal", isTime: true, targetReps: 30, url: "https://www.youtube.com/shorts/TYpyxNCCdHc", desc: "4 series x Máximos segundos" }
+            ]
+          },
+          {
+            level: 3,
+            name: "Fase 3: Pino Libre y Semipress",
+            unlocked: false,
+            reqText: "¡Habilidad máxima desbloqueada! Domina la vertical a fuerza libre.",
+            exercises: [
+              { name: "Semipress a Vertical", load: "Peso Corporal", isTime: false, targetReps: 3, url: "https://www.youtube.com/shorts/862lhECl9Dk", desc: "4 series x Máximas reps" },
+              { name: "Pino Libre", load: "Peso Corporal", isTime: true, targetReps: 10, url: "https://www.youtube.com/shorts/862lhECl9Dk", desc: "4 series x Máximos segundos" }
+            ]
+          }
         ]
       }
     };
 
     // ESTADO DE PERSISTENCIA
-    let progState = JSON.parse(localStorage.getItem('fullbody_state')) || {
-      exerciseConfigs: {},
+    let progState = JSON.parse(localStorage.getItem('calisthenics_state')) || {
+      unlockedLevels: { muscleUp: 1, handstand: 1 },
+      records: {},
+      lastFocusType: null,
+      cyclePool: [],
       history: [],
-      lastSessionExercises: [],
       activeWorkout: null
     };
 
-    if (!progState.exerciseConfigs) {
-      progState.exerciseConfigs = {};
-    }
-
     function saveState() {
-      localStorage.setItem('fullbody_state', JSON.stringify(progState));
+      localStorage.setItem('calisthenics_state', JSON.stringify(progState));
     }
 
-    function getExerciseConfig(exName) {
-      if (progState.exerciseConfigs && progState.exerciseConfigs[exName]) {
-        return progState.exerciseConfigs[exName];
+    // Selección por ciclo completo (Shuffle Pool)
+    function getRandomFocusType() {
+      if (!progState.cyclePool || progState.cyclePool.length === 0) {
+        let newPool = [0, 1, 2];
+        for (let i = newPool.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [newPool[i], newPool[j]] = [newPool[j], newPool[i]];
+        }
+        if (progState.lastFocusType !== null && newPool[0] === progState.lastFocusType) {
+          const temp = newPool[0];
+          newPool[0] = newPool[newPool.length - 1];
+          newPool[newPool.length - 1] = temp;
+        }
+        progState.cyclePool = newPool;
       }
       
-      for (const groupKey in EXERCISE_DATABASE) {
-        const item = EXERCISE_DATABASE[groupKey].items.find(e => e.name === exName);
-        if (item) {
-          return { reps: item.defaultReps, weight: item.defaultWeight };
-        }
-      }
-
-      return { reps: 12, weight: 15 };
+      return progState.cyclePool[0];
     }
 
-    function updateExerciseConfig(exName, field, delta) {
-      const current = getExerciseConfig(exName);
-      if (!progState.exerciseConfigs[exName]) {
-        progState.exerciseConfigs[exName] = { ...current };
-      }
-
-      if (field === 'reps') {
-        const newReps = Math.max(1, (progState.exerciseConfigs[exName].reps || current.reps) + delta);
-        progState.exerciseConfigs[exName].reps = newReps;
-      } else if (field === 'weight') {
-        const newWeight = Math.max(0, (progState.exerciseConfigs[exName].weight || current.weight) + delta);
-        progState.exerciseConfigs[exName].weight = newWeight;
-      }
-
-      saveState();
-      renderProgressionView();
+    function getFocusName(type) {
+      if (type === 0) return "Sesión A";
+      if (type === 1) return "Sesión B";
+      return "Sesión C";
     }
 
-    function setExerciseConfigDirect(exName, field, val) {
-      const numVal = parseInt(val, 10);
-      if (isNaN(numVal)) return;
+    function updateFocusBadge() {}
 
-      const current = getExerciseConfig(exName);
-      if (!progState.exerciseConfigs[exName]) {
-        progState.exerciseConfigs[exName] = { ...current };
-      }
-
-      if (field === 'reps') {
-        progState.exerciseConfigs[exName].reps = Math.max(1, numVal);
-      } else if (field === 'weight') {
-        progState.exerciseConfigs[exName].weight = Math.max(0, numVal);
-      }
-
-      saveState();
-    }
-
-    function resetProgressionDefaults() {
-      showModal(
-        "¿Restablecer progresiones?",
-        "Se restaurarán las repeticiones y pesos originales de todos los ejercicios.",
-        () => {
-          progState.exerciseConfigs = {};
-          saveState();
-          renderProgressionView();
-        }
-      );
-    }
-
-    function renderProgressionView() {
-      const container = document.getElementById('progression-exercise-list');
-      if (!container) return;
-
-      container.innerHTML = '';
-      const groupKeys = ['legs', 'chest', 'arms', 'shouldersTriceps', 'calves', 'core'];
-
-      groupKeys.forEach(groupKey => {
-        const group = EXERCISE_DATABASE[groupKey];
-        if (!group) return;
-
-        const groupWrapper = document.createElement('div');
-        groupWrapper.className = "bg-slate-950 rounded-xl p-3 border border-slate-800 space-y-3";
-
-        groupWrapper.innerHTML = `
-          <div class="flex items-center gap-2 pb-2 border-b border-slate-800 text-brand-accent font-black text-xs uppercase tracking-wider">
-            <i class="${group.icon} text-sm"></i>
-            <span>${group.title}</span>
-          </div>
-        `;
-
-        const itemsContainer = document.createElement('div');
-        itemsContainer.className = "space-y-3";
-
-        group.items.forEach(item => {
-          const cfg = getExerciseConfig(item.name);
-          const wStep = item.weightStep || 5;
-
-          const exRow = document.createElement('div');
-          exRow.className = "bg-slate-900 border border-slate-800/80 rounded-xl p-3 space-y-2.5 shadow-sm";
-
-          exRow.innerHTML = `
-            <div class="flex justify-between items-center">
-              <span class="text-sm font-bold text-white flex items-center gap-1.5">
-                ${item.name}
-              </span>
-              <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="text-[11px] font-bold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 px-2 py-0.5 rounded-lg transition">
-                <i class="fa-brands fa-youtube mr-1"></i>Técnica
-              </a>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 pt-1">
-              <div class="bg-slate-950 border border-slate-800 rounded-lg p-2 flex flex-col items-center justify-between">
-                <span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Repeticiones</span>
-                <div class="flex items-center justify-between w-full gap-1">
-                  <button onclick="updateExerciseConfig('${item.name}', 'reps', -1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-90 text-brand-accent font-black flex items-center justify-center transition border border-slate-700">
-                    <i class="fa-solid fa-minus text-xs"></i>
-                  </button>
-                  <div class="flex-1 text-center">
-                    <input type="number" value="${cfg.reps}" min="1" onchange="setExerciseConfigDirect('${item.name}', 'reps', this.value)" class="w-full bg-transparent text-center font-black text-white text-base focus:outline-none focus:text-brand-accent">
-                    <span class="text-[9px] text-slate-500 block -mt-1">reps</span>
-                  </div>
-                  <button onclick="updateExerciseConfig('${item.name}', 'reps', 1)" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-90 text-brand-accent font-black flex items-center justify-center transition border border-slate-700">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                  </button>
-                </div>
-              </div>
-
-              <div class="bg-slate-950 border border-slate-800 rounded-lg p-2 flex flex-col items-center justify-between">
-                <span class="text-[10px] uppercase font-bold text-slate-400 mb-1">Peso (kg)</span>
-                <div class="flex items-center justify-between w-full gap-1">
-                  <button onclick="updateExerciseConfig('${item.name}', 'weight', -${wStep})" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-90 text-emerald-400 font-black flex items-center justify-center transition border border-slate-700">
-                    <i class="fa-solid fa-minus text-xs"></i>
-                  </button>
-                  <div class="flex-1 text-center">
-                    <input type="number" value="${cfg.weight}" min="0" step="${wStep}" onchange="setExerciseConfigDirect('${item.name}', 'weight', this.value)" class="w-full bg-transparent text-center font-black text-white text-base focus:outline-none focus:text-emerald-400">
-                    <span class="text-[9px] text-slate-500 block -mt-1">${cfg.weight === 0 ? 'Corporal' : 'kg'}</span>
-                  </div>
-                  <button onclick="updateExerciseConfig('${item.name}', 'weight', ${wStep})" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 active:scale-90 text-emerald-400 font-black flex items-center justify-center transition border border-slate-700">
-                    <i class="fa-solid fa-plus text-xs"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          `;
-
-          itemsContainer.appendChild(exRow);
-        });
-
-        groupWrapper.appendChild(itemsContainer);
-        container.appendChild(groupWrapper);
-      });
-    }
-
-    function getRandomItem(arr) {
-      return arr[Math.floor(Math.random() * arr.length)];
-    }
-
-    function shuffleArray(arr) {
-      const array = [...arr];
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-
-    // Escoge un ejercicio evitando cualquier ejercicio que haya formado parte de la sesión anterior.
-    function getNonRepeatingExercise(pool) {
-      const lastSession = progState.lastSessionExercises || [];
-      const available = pool.filter(ex => !lastSession.includes(ex.name));
-
-      if (available.length > 0) {
-        return getRandomItem(available);
-      }
-      return getRandomItem(pool);
-    }
-
-    function confirmNewWorkout() {
+    function confirmNextWorkout() {
       if (progState.activeWorkout) {
         showModal(
           "¿Reemplazar entrenamiento?",
-          "Tienes una sesión activa sin finalizar. ¿Deseas descartarla y crear una nueva?",
+          "Tienes una sesión activa sin finalizar. ¿Deseas descartarla y generar la nueva?",
           () => {
-            generateRandomWorkout();
+            generateNextWorkout();
           }
         );
       } else {
-        generateRandomWorkout();
+        generateNextWorkout();
       }
     }
 
-    // GENERADOR ALEATORIO CON ANTI-REPETICIÓN EN SESIONES CONSECUTIVAS
-    function generateRandomWorkout() {
-      // Selección garantizada sin repetición con respecto a la sesión inmediatamente anterior
-      const legEx = getNonRepeatingExercise(EXERCISE_DATABASE.legs.items);
-      const chestEx = getNonRepeatingExercise(EXERCISE_DATABASE.chest.items);
-      const armEx = getNonRepeatingExercise(EXERCISE_DATABASE.arms.items);
-      const shoulderEx = getNonRepeatingExercise(EXERCISE_DATABASE.shouldersTriceps.items);
-      const calfEx = getNonRepeatingExercise(EXERCISE_DATABASE.calves.items);
-      const coreEx = getNonRepeatingExercise(EXERCISE_DATABASE.core.items);
+    function generateNextWorkout() {
+      const focusType = getRandomFocusType();
+      let list = [];
 
-      const midPool = [
-        { type: "Pecho", categoryKey: "chest", ex: chestEx },
-        { type: "Brazos", categoryKey: "arms", ex: armEx },
-        { type: "Hombro/Tríceps", categoryKey: "shouldersTriceps", ex: shoulderEx }
-      ];
-      const shuffledMid = shuffleArray(midPool);
+      const muLvl = progState.unlockedLevels.muscleUp || 1;
+      const hsLvl = progState.unlockedLevels.handstand || 1;
 
-      // Puesto 1: Piernas | Puestos 2, 3, 4: Pecho, Brazos, Hombro/Tríceps (Alternados)
-      // Puesto 5: Pantorrillas (Fijo) | Puesto 6: Core / Rueda Abdominal (Fijo)
-      const fullList = [
-        { pos: "Puesto 1 (Piernas)", categoryKey: "legs", ex: legEx },
-        { pos: `Puesto 2 (${shuffledMid[0].type})`, categoryKey: shuffledMid[0].categoryKey, ex: shuffledMid[0].ex },
-        { pos: `Puesto 3 (${shuffledMid[1].type})`, categoryKey: shuffledMid[1].categoryKey, ex: shuffledMid[1].ex },
-        { pos: `Puesto 4 (${shuffledMid[2].type})`, categoryKey: shuffledMid[2].categoryKey, ex: shuffledMid[2].ex },
-        { pos: "Puesto 5 (Pantorrillas)", categoryKey: "calves", ex: calfEx },
-        { pos: "Puesto 6 (Core)", categoryKey: "core", ex: coreEx }
-      ];
+      if (focusType === 0) {
+        // SESIÓN A: Empuje + Tracción Vertical
+        const habEx = muLvl >= 2
+          ? { name: "Muscle Up Negativo con Salto", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/xNRM4tEUtDA", desc: "4 series x Máximas reps (>4s bajada)" }
+          : { name: "Dominadas Estrictas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/MPbRERVWkbg", desc: "4 series x Máximas reps" };
 
-      // Guardar lista de ejercicios elegidos para evitar repetir el mismo en la próxima sesión
-      const selectedNames = fullList.map(item => item.ex.name);
-      progState.lastSessionExercises = selectedNames;
+        list = [
+          { pos: "1. Habilidad (Tirón Vertical)", ...habEx },
+          { pos: "2. Tracción", name: "Remo", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/-RngKKzbEnI", desc: "4 series x Máximas reps" },
+          { pos: "3. Empuje", name: "Flexiones Declinadas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/5Nm2wr3CgNA", desc: "4 series x Máximas reps" },
+          { pos: "4. Pierna", name: "Sentadilla", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/4xVs7iOSd2Q", desc: "4 series x Máximas reps" },
+          { pos: "5. Core / Agarre", name: "Rueda Abdominal", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/lhYSUUWaFEU", desc: "3 series x Máximas reps" }
+        ];
 
-      currentWorkoutData = fullList.map(item => {
-        const cfg = getExerciseConfig(item.ex.name);
-        const loadText = cfg.weight > 0 ? `Mancuernas / Peso ${cfg.weight} kg` : 'Peso Corporal';
-        const descText = `4 series x ${cfg.reps} reps`;
+      } else if (focusType === 1) {
+        // SESIÓN B: Tracción + Handstand
+        const tracEx = muLvl >= 2
+          ? { name: "Dominadas Explosivas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/HnGH_yr80cw", desc: "4 series x Máximas reps" }
+          : { name: "Dominadas Supinas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/P-ewAI7ns5E", desc: "4 series x Máximas reps" };
 
-        return {
-          pos: item.pos,
-          name: item.ex.name,
-          load: loadText,
-          url: item.ex.url,
-          desc: descText
-        };
-      });
+        if (hsLvl >= 2) {
+          list = [
+            { pos: "1a. Habilidad (Pino en Pared)", name: "Pino en Pared (Chest-to-Wall)", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/TYpyxNCCdHc", desc: "4 series x Máximos segundos" },
+            { pos: "1b. Complemento Handstand", name: "Agarre Enanito (Frog Stand)", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/fCc9UB0LuHk", desc: "3 series x Máximos segundos" },
+            { pos: "2. Tracción", ...tracEx },
+            { pos: "3. Empuje", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/s5BLhbKWD3E", desc: "4 series x Máximas reps" },
+            { pos: "4. Pierna", name: "Zancadas", load: "Mancuerna 25 kg / Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/lT-oysQ-qKY", desc: "4 series x Máximas reps" },
+            { pos: "5. Core / Agarre", name: "Elevación de Rodillas a Pecho", load: "Peso Corporal en Paralelas", isTime: false, url: "https://www.youtube.com/shorts/HBvQGkHGpyc", desc: "3 series x Máximas reps" }
+          ];
+        } else {
+          list = [
+            { pos: "1. Habilidad (Handstand)", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/6esmbGzzF6w", desc: "4 series x Máximas reps" },
+            { pos: "2. Tracción", ...tracEx },
+            { pos: "3. Empuje", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/s5BLhbKWD3E", desc: "4 series x Máximas reps" },
+            { pos: "4. Pierna", name: "Zancadas", load: "Mancuerna 25 kg / Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/lT-oysQ-qKY", desc: "4 series x Máximas reps" },
+            { pos: "5. Core / Agarre", name: "Elevación de Rodillas a Pecho", load: "Peso Corporal en Paralelas", isTime: false, url: "https://www.youtube.com/shorts/HBvQGkHGpyc", desc: "3 series x Máximas reps" }
+          ];
+        }
 
+      } else {
+        // SESIÓN C: Fuerza General + Puntos Débiles
+        list = [
+          { pos: "1. Tracción Horizontal", name: "Remo invertido en paralelas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/d96u1uOOpDQ", desc: "4 series x Máximas reps" },
+          { pos: "2. Empuje Vertical", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/6esmbGzzF6w", desc: "4 series x Máximas reps" },
+          { pos: "3. Pierna", name: "Sentadilla", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/4xVs7iOSd2Q", desc: "4 series x Máximas reps" },
+          { pos: "4. Bíceps / Aislamiento", name: "Curl concentrado", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/JM6T3kun48k", desc: "3 series x Máximas reps" },
+          { pos: "5. Core / Agarre", name: "Colgado Pasivo (Dead Hang)", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/Y7uuRKP9Lzs", desc: "3 series x Máximos segundos" }
+        ];
+
+        if (hsLvl >= 2) {
+          list.push({ pos: "6. Complemento Handstand", name: "Pino en Pared (Chest-to-Wall)", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/TYpyxNCCdHc", desc: "2 series x 15-20 seg (técnica, no al fallo)" });
+        }
+      }
+
+      currentWorkoutData = list;
       guidedIndex = 0;
       completedSetsMap = {};
-      
+
       currentWorkoutData.forEach((_, idx) => {
-        completedSetsMap[idx] = [false, false, false, false];
+        completedSetsMap[idx] = [0, 0, 0, 0];
       });
 
+      progState.lastFocusType = focusType;
       progState.activeWorkout = {
         date: selectedDate,
+        focusTitle: getFocusName(focusType),
         workoutData: currentWorkoutData,
         guidedIndex: guidedIndex,
         completedSetsMap: completedSetsMap,
-        createdTime: Date.now()
+        createdTime: Date.now(),
+        muLvl: muLvl,
+        hsLvl: hsLvl
       };
+
       saveState();
 
       renderWorkoutView();
@@ -666,17 +553,8 @@
       );
     }
 
-    function getSessionTitleForDate(dateStr) {
-      if (!dateStr) return "Sesión";
-      const [year, month, day] = dateStr.split('-');
-      const dateObj = new Date(year, month - 1, day);
-      const dayName = dateObj.toLocaleDateString('es-ES', { weekday: 'long' });
-      const capitalizedDay = dayName.charAt(0).toUpperCase() + dayName.slice(1);
-      return `Sesión ${capitalizedDay}`;
-    }
-
     function renderWorkoutView() {
-      const titleName = getSessionTitleForDate(selectedDate);
+      const titleName = progState.activeWorkout?.focusTitle || "Sesión de Entrenamiento";
       document.getElementById('workout-session-title').innerText = titleName;
       document.getElementById('workout-date-title').innerText = document.getElementById('date-display').innerText;
 
@@ -695,6 +573,7 @@
 
       const totalEx = currentWorkoutData.length;
       const current = currentWorkoutData[guidedIndex];
+      const record = progState.records[current.name] || 0;
 
       document.getElementById('guided-step-text').innerText = `Ejercicio ${guidedIndex + 1} de ${totalEx}`;
       const pct = Math.round(((guidedIndex + 1) / totalEx) * 100);
@@ -713,26 +592,14 @@
       }
 
       const card = document.getElementById('guided-exercise-card');
-      const setsState = completedSetsMap[guidedIndex] || [false, false, false, false];
-
-      let setsButtonsHtml = '';
-      for (let i = 0; i < 4; i++) {
-        const isDone = setsState[i];
-        setsButtonsHtml += `
-          <button onclick="toggleSetDone(${guidedIndex}, ${i})" class="flex-1 py-2.5 rounded-xl border text-xs font-bold transition flex flex-col items-center justify-center gap-1 active:scale-95 ${
-            isDone 
-            ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300' 
-            : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-          }">
-            <span class="text-[10px] text-slate-500 uppercase">Serie ${i+1}</span>
-            <i class="fa-solid ${isDone ? 'fa-circle-check text-emerald-400 text-sm' : 'fa-circle text-slate-700 text-xs'}"></i>
-          </button>
-        `;
-      }
+      const setsState = completedSetsMap[guidedIndex] || [0, 0, 0, 0];
 
       card.innerHTML = `
         <div class="flex justify-between items-center border-b border-slate-800 pb-2">
           <span class="text-xs font-black text-brand-accent uppercase tracking-wider">${current.pos}</span>
+          <span class="text-[11px] font-bold text-amber-400 bg-amber-400/10 border border-amber-400/20 px-2 py-0.5 rounded-lg">
+            <i class="fa-solid fa-trophy mr-1"></i>Récord: ${record} ${current.isTime ? 'seg' : 'reps'}
+          </span>
         </div>
 
         <div class="flex justify-between items-start gap-2 pt-1">
@@ -745,7 +612,7 @@
           </div>
           <a href="${current.url}" target="_blank" rel="noopener noreferrer" class="shrink-0 inline-flex items-center gap-1.5 text-xs font-bold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 px-3 py-1.5 rounded-xl transition active:scale-95 shadow-sm">
             <i class="fa-brands fa-youtube text-rose-500 text-base"></i>
-            <span>Ver Técnica</span>
+            <span>Técnica</span>
           </a>
         </div>
 
@@ -758,23 +625,62 @@
 
         <div class="space-y-1.5 pt-1">
           <div class="flex justify-between items-center">
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Marcador de Series</span>
-            <span class="text-[10px] text-slate-500">Toca para marcar lista</span>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Registro por Serie</span>
+            <span class="text-[10px] text-slate-500">Anota tus máximas</span>
           </div>
           <div class="grid grid-cols-4 gap-2">
-            ${setsButtonsHtml}
+            ${(() => {
+              const targetSetsMatch = current.desc.match(/^(\d+)\s*series/i);
+              const totalAllowedSets = targetSetsMatch ? parseInt(targetSetsMatch[1], 10) : 4;
+
+              let setsInputsHtml = '';
+              for (let i = 0; i < 4; i++) {
+                const val = setsState[i] || '';
+                const isDisabled = (i >= totalAllowedSets);
+
+                if (isDisabled) {
+                  setsInputsHtml += `
+                    <div class="bg-rose-950/20 border border-rose-500/30 rounded-xl p-2.5 text-center flex flex-col justify-between opacity-60 pointer-events-none relative overflow-hidden">
+                      <span class="text-[10px] uppercase font-bold text-rose-400/70 mb-1">Serie ${i+1}</span>
+                      <div class="w-full bg-slate-950/80 border border-rose-500/20 rounded-lg py-1.5 text-center font-black text-rose-400/40 text-base">
+                        N/A
+                      </div>
+                      <span class="text-[9px] text-rose-400/50 block mt-1"><i class="fa-solid fa-ban mr-0.5"></i> Bloqueada</span>
+                    </div>
+                  `;
+                } else {
+                  setsInputsHtml += `
+                    <div class="bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-center flex flex-col justify-between">
+                      <span class="text-[10px] uppercase font-bold text-slate-500 mb-1">Serie ${i+1}</span>
+                      <input type="number" min="0" value="${val}" placeholder="0" 
+                        onchange="updateSetScore(${guidedIndex}, ${i}, this.value)"
+                        class="w-full bg-slate-900 border border-slate-700/80 rounded-lg py-1.5 text-center font-black text-white text-base focus:outline-none focus:border-brand-accent">
+                      <span class="text-[9px] text-slate-500 block mt-1">${current.isTime ? 'seg' : 'reps'}</span>
+                    </div>
+                  `;
+                }
+              }
+              return setsInputsHtml;
+            })()}
           </div>
         </div>
       `;
     }
 
-    function toggleSetDone(exIdx, setIdx) {
+    function updateSetScore(exIdx, setIdx, val) {
+      const num = parseInt(val, 10) || 0;
       if (!completedSetsMap[exIdx]) {
-        completedSetsMap[exIdx] = [false, false, false, false];
+        completedSetsMap[exIdx] = [0, 0, 0, 0];
       }
-      completedSetsMap[exIdx][setIdx] = !completedSetsMap[exIdx][setIdx];
+      completedSetsMap[exIdx][setIdx] = num;
+
+      const exName = currentWorkoutData[exIdx].name;
+      const currentRecord = progState.records[exName] || 0;
+      if (num > currentRecord) {
+        progState.records[exName] = num;
+      }
+
       saveActiveWorkoutState();
-      renderGuidedExercise();
     }
 
     function navigateGuidedExercise(direction) {
@@ -810,17 +716,21 @@
       container.innerHTML = '';
 
       currentWorkoutData.forEach((item) => {
+        const record = progState.records[item.name] || 0;
         const card = document.createElement('div');
         card.className = "bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-2.5 shadow-sm";
         
         card.innerHTML = `
           <div class="flex justify-between items-center">
             <span class="text-xs font-black text-brand-accent uppercase tracking-wider">${item.pos}</span>
+            <span class="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-lg border border-amber-400/20">
+              Récord: ${record} ${item.isTime ? 'seg' : 'reps'}
+            </span>
           </div>
 
           <div class="flex justify-between items-start gap-2">
             <h3 class="text-base font-bold text-white leading-snug">${item.name}</h3>
-            <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-bold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 px-2.5 py-1 rounded-lg transition active:scale-95">
+            <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="shrink-0 inline-flex items-center gap-1.5 text-[11px] font-bold text-rose-400 bg-rose-500/10 border border-rose-500/30 px-2.5 py-1 rounded-lg">
               <i class="fa-brands fa-youtube text-rose-500 text-sm"></i>
               <span>Técnica</span>
             </a>
@@ -841,59 +751,107 @@
       });
     }
 
-    function playSubtleTimerBeep() {
-      try {
-        if (!audioCtx) {
-          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // VERIFICACIÓN Y DESBLOQUEO DE NIVELES AL FINALIZAR
+    function checkSkillUnlocks() {
+      let newlyUnlocked = [];
+
+      // Evaluar Rama Muscle Up
+      const muLvl = progState.unlockedLevels.muscleUp || 1;
+      if (muLvl === 1) {
+        const domReps = progState.records["Dominadas Estrictas"] || 0;
+        const fonReps = progState.records["Fondos"] || 0;
+        if (domReps >= 10 && fonReps >= 12) {
+          progState.unlockedLevels.muscleUp = 2;
+          newlyUnlocked.push("Muscle Up - Fase 2 (Dominadas Explosivas y Negativas)");
         }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
+      } else if (muLvl === 2) {
+        const expReps = progState.records["Dominadas Explosivas"] || 0;
+        const negReps = progState.records["Muscle Up Negativo con Salto"] || 0;
+        if (expReps >= 6 && negReps >= 5) {
+          progState.unlockedLevels.muscleUp = 3;
+          newlyUnlocked.push("Muscle Up - Fase 3 (Muscle Up Estricto Completo)");
         }
-
-        const now = audioCtx.currentTime;
-        const beepSchedule = [0, 1.1, 2.2, 3.3, 4.4];
-
-        beepSchedule.forEach(offset => {
-          const startTime = now + offset;
-
-          const osc1 = audioCtx.createOscillator();
-          const gain1 = audioCtx.createGain();
-          osc1.type = 'triangle';
-          osc1.frequency.setValueAtTime(880, startTime);
-          osc1.frequency.exponentialRampToValueAtTime(1320, startTime + 0.15);
-
-          gain1.gain.setValueAtTime(0.001, startTime);
-          gain1.gain.linearRampToValueAtTime(0.65, startTime + 0.03);
-          gain1.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
-
-          osc1.connect(gain1);
-          gain1.connect(audioCtx.destination);
-
-          osc1.start(startTime);
-          osc1.stop(startTime + 0.35);
-
-          const osc2 = audioCtx.createOscillator();
-          const gain2 = audioCtx.createGain();
-          osc2.type = 'sine';
-          osc2.frequency.setValueAtTime(1108.73, startTime + 0.1);
-
-          gain2.gain.setValueAtTime(0.001, startTime + 0.1);
-          gain2.gain.linearRampToValueAtTime(0.55, startTime + 0.13);
-          gain2.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4);
-
-          osc2.connect(gain2);
-          gain2.connect(audioCtx.destination);
-
-          osc2.start(startTime + 0.1);
-          osc2.stop(startTime + 0.4);
-        });
-
-      } catch (e) {
-        // Fallback silencioso si no hay soporte de Web Audio
       }
 
+      // Evaluar Rama Pino / Handstand
+      const hsLvl = progState.unlockedLevels.handstand || 1;
+      if (hsLvl === 1) {
+        const pikeReps = progState.records["Flexiones en Pica"] || 0;
+        if (pikeReps >= 10) {
+          progState.unlockedLevels.handstand = 2;
+          newlyUnlocked.push("El Pino - Fase 2 (Agarre Enanito y Pino en Pared)");
+        }
+      } else if (hsLvl === 2) {
+        const frogSecs = progState.records["Agarre Enanito (Frog Stand)"] || 0;
+        const wallSecs = progState.records["Pino en Pared (Chest-to-Wall)"] || 0;
+        if (frogSecs >= 15 && wallSecs >= 30) {
+          progState.unlockedLevels.handstand = 3;
+          newlyUnlocked.push("El Pino - Fase 3 (Pino Libre)");
+        }
+      }
+
+      saveState();
+
+      if (newlyUnlocked.length > 0) {
+        showModal(
+          "¡NIVEL DESBLOQUEADO! 🔓🎉",
+          `¡Felicidades! Has superado los requisitos y desbloqueado: ${newlyUnlocked.join(", ")}.`,
+          () => {}
+        );
+      }
+    }
+
+    function completeWorkout() {
+      const titleName = progState.activeWorkout?.focusTitle || "Sesión";
+
+      const entry = {
+        id: Date.now(),
+        date: selectedDate,
+        title: titleName,
+        count: currentWorkoutData.length
+      };
+      
+      progState.history.push(entry);
+      
+      if (progState.cyclePool && progState.cyclePool.length > 0) {
+        progState.cyclePool.shift();
+      }
+
+      progState.activeWorkout = null;
+      saveState();
+
+      checkSkillUnlocks();
+      resetTimer();
+      showDashboard();
+      renderHistory();
+    }
+
+    // AUDIO & TEMPORIZADOR
+    function playSubtleTimerBeep() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const now = audioCtx.currentTime;
+        [0, 1.1, 2.2].forEach(offset => {
+          const startTime = now + offset;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(880, startTime);
+          osc.frequency.exponentialRampToValueAtTime(1320, startTime + 0.15);
+          gain.gain.setValueAtTime(0.001, startTime);
+          gain.gain.linearRampToValueAtTime(0.65, startTime + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(startTime);
+          osc.stop(startTime + 0.35);
+        });
+      } catch (e) {}
+
       if ("vibrate" in navigator) {
-        navigator.vibrate([250, 850, 250, 850, 250, 850, 250, 850, 350]);
+        navigator.vibrate([250, 850, 250, 850]);
       }
     }
 
@@ -926,20 +884,13 @@
       if (!navigator.wakeLock || !navigator.wakeLock.request) return;
       try {
         wakeLockSentinel = await navigator.wakeLock.request('screen');
-        const requestedSentinel = wakeLockSentinel;
-        requestedSentinel.addEventListener('release', () => {
-          if (wakeLockSentinel === requestedSentinel) wakeLockSentinel = null;
-        });
-      } catch (error) {
-        console.warn('No se pudo activar el bloqueo de pantalla:', error);
-      }
+      } catch (error) {}
     }
 
     function releaseWakeLock() {
       if (!wakeLockSentinel) return;
-      const sentinel = wakeLockSentinel;
+      wakeLockSentinel.release().catch(() => {});
       wakeLockSentinel = null;
-      sentinel.release().catch(error => console.warn('No se pudo liberar el bloqueo de pantalla:', error));
     }
 
     function updateTimerFromTimestamp() {
@@ -957,10 +908,6 @@
       }
     }
 
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden && !isTimerPaused && timerEndTime !== null) updateTimerFromTimestamp();
-    });
-
     function updateTimerUI() {
       const minutes = Math.floor(timerSecondsLeft / 60);
       const secs = timerSecondsLeft % 60;
@@ -974,7 +921,6 @@
       if (timerSecondsLeft > 0) {
         boxEl.classList.add('timer-active', 'border-brand-500/50', 'bg-brand-950/20');
         clockEl.classList.add('text-brand-accent');
-        clockEl.classList.remove('text-slate-200', 'text-emerald-400');
       } else {
         boxEl.classList.remove('timer-active', 'border-brand-500/50', 'bg-brand-950/20');
       }
@@ -1015,55 +961,91 @@
 
       document.getElementById('timer-clock').innerText = "00:00";
       document.getElementById('timer-clock').className = "text-3xl font-black font-mono tracking-wider text-slate-200";
-      document.getElementById('timer-label').innerText = "Selecciona el descanso";
+      document.getElementById('timer-label').innerText = "Pulsa para descansar";
       document.getElementById('timer-status-badge').innerText = "Listos";
       document.getElementById('timer-status-badge').className = "text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold";
       document.getElementById('timer-controls').classList.add('hidden');
-      document.getElementById('timer-display-box').classList.remove('timer-active', 'border-brand-500/50', 'bg-brand-950/20', 'border-emerald-500/50', 'bg-emerald-950/30');
     }
 
     function onTimerComplete() {
       clearInterval(timerInterval);
       timerInterval = null;
       timerEndTime = null;
-      pausedTimeLeft = 0;
-      timerSecondsLeft = 0;
-      isTimerPaused = false;
       releaseWakeLock();
       playSubtleTimerBeep();
 
       const clockEl = document.getElementById('timer-clock');
-      const boxEl = document.getElementById('timer-display-box');
-
       clockEl.innerText = "¡TIEMPO!";
-      clockEl.className = "text-2xl font-black font-sans tracking-wider text-emerald-400 animate-bounce";
-      boxEl.classList.add('border-emerald-500/50', 'bg-emerald-950/30');
+      clockEl.className = "text-2xl font-black tracking-wider text-emerald-400 animate-bounce";
 
       document.getElementById('timer-status-badge').innerText = "¡Completado!";
       document.getElementById('timer-status-badge').className = "text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold";
-
-      setTimeout(() => {
-        clockEl.classList.remove('animate-bounce');
-      }, 5000);
     }
 
-    function completeWorkout() {
-      const titleName = getSessionTitleForDate(selectedDate);
+    // VISTA Y ÁRBOLES DE HABILIDAD
+    function renderSkillsTree() {
+      const container = document.getElementById('skills-tree-list');
+      if (!container) return;
 
-      const entry = {
-        id: Date.now(),
-        date: selectedDate,
-        title: titleName,
-        count: currentWorkoutData.length
-      };
-      
-      progState.history.push(entry);
-      progState.activeWorkout = null;
-      saveState();
+      container.innerHTML = '';
 
-      resetTimer();
-      showDashboard();
-      renderHistory();
+      Object.keys(SKILL_TREES).forEach(treeKey => {
+        const tree = SKILL_TREES[treeKey];
+        const unlockedLvl = progState.unlockedLevels[treeKey] || 1;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = "bg-slate-950 rounded-2xl p-4 border border-slate-800 space-y-4";
+
+        let levelsHtml = '';
+        tree.levels.forEach(lvl => {
+          const isUnlocked = lvl.level <= unlockedLvl;
+
+          let exListHtml = '';
+          lvl.exercises.forEach(ex => {
+            const rec = progState.records[ex.name] || 0;
+            exListHtml += `
+              <div class="flex justify-between items-center text-xs bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
+                <div>
+                  <span class="font-bold text-white block">${ex.name}</span>
+                  <span class="text-[10px] text-slate-400">Meta: ≥ ${ex.targetReps} ${ex.isTime ? 'seg' : 'reps'}</span>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] text-amber-400 font-bold block">Récord: ${rec} ${ex.isTime ? 'seg' : 'reps'}</span>
+                  <a href="${ex.url}" target="_blank" class="text-[10px] text-rose-400 hover:underline">Ver Técnica</a>
+                </div>
+              </div>
+            `;
+          });
+
+          levelsHtml += `
+            <div class="p-3 rounded-xl border ${isUnlocked ? 'bg-slate-900/50 border-emerald-500/30' : 'bg-slate-900/20 border-slate-800/80 opacity-70'} space-y-2">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-black ${isUnlocked ? 'text-emerald-400' : 'text-slate-500'}">
+                  ${isUnlocked ? '<i class="fa-solid fa-lock-open mr-1"></i>' : '<i class="fa-solid fa-lock mr-1"></i>'}
+                  ${lvl.name}
+                </span>
+                ${isUnlocked ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-black px-2 py-0.5 rounded-md">ACTIVO</span>' : ''}
+              </div>
+              <p class="text-[11px] text-slate-400 italic">${lvl.reqText}</p>
+              <div class="space-y-1.5 pt-1">
+                ${exListHtml}
+              </div>
+            </div>
+          `;
+        });
+
+        wrapper.innerHTML = `
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <h3 class="font-black text-sm text-white ${tree.badgeColor}">${tree.title}</h3>
+            <span class="text-xs font-bold text-slate-400">Nivel ${unlockedLvl} de ${tree.levels.length}</span>
+          </div>
+          <div class="space-y-3">
+            ${levelsHtml}
+          </div>
+        `;
+
+        container.appendChild(wrapper);
+      });
     }
 
     function renderHistory() {
@@ -1114,7 +1096,7 @@
       const bannerInfo = document.getElementById('active-banner-info');
       
       if (progState.activeWorkout && progState.activeWorkout.workoutData) {
-        const title = getSessionTitleForDate(progState.activeWorkout.date);
+        const title = progState.activeWorkout.focusTitle || "Sesión";
         const curEx = progState.activeWorkout.guidedIndex + 1;
         const totalEx = progState.activeWorkout.workoutData.length;
         bannerInfo.innerText = `${title} • Ejercicio ${curEx} de ${totalEx}`;
@@ -1128,22 +1110,13 @@
       document.getElementById('view-workout').classList.add('hidden');
       document.getElementById('view-progression').classList.add('hidden');
       document.getElementById('view-dashboard').classList.remove('hidden');
-      document.getElementById('nav-btn').innerHTML = `<i class="fa-solid fa-sliders"></i><span>Progresión</span>`;
+      updateFocusBadge();
       updateBannerStatus();
       window.scrollTo(0, 0);
     }
 
     function toggleView() {
-      const progView = document.getElementById('view-progression');
-      if (progView.classList.contains('hidden')) {
-        renderProgressionView();
-        document.getElementById('view-dashboard').classList.add('hidden');
-        document.getElementById('view-workout').classList.add('hidden');
-        progView.classList.remove('hidden');
-        document.getElementById('nav-btn').innerHTML = `<i class="fa-solid fa-house"></i><span>Inicio</span>`;
-      } else {
-        showDashboard();
-      }
+      showDashboard();
     }
 
     function updateDateDisplay(val) {
@@ -1155,7 +1128,7 @@
       document.getElementById('date-display').innerText = d.toLocaleDateString('es-ES', options);
     }
 
-    // UTILERÍA MODAL PERSONALIZADA
+    // UTILERÍA MODAL
     let modalConfirmCallback = null;
     function showModal(title, message, onConfirm) {
       document.getElementById('modal-title').innerText = title;
@@ -1177,14 +1150,28 @@
     }
 
     window.onload = function() {
+      const recordMigrations = {
+        "Dominadas Pronadas Estrictas": "Dominadas Estrictas",
+        "Fondos en Paralelas": "Fondos",
+        "Dominadas Explosivas al Pecho": "Dominadas Explosivas",
+        "Flexiones en Pica (Pike Pushups)": "Flexiones en Pica"
+      };
+      Object.entries(recordMigrations).forEach(([oldName, newName]) => {
+        if (progState.records[oldName] !== undefined && progState.records[newName] === undefined) {
+          progState.records[newName] = progState.records[oldName];
+          delete progState.records[oldName];
+        }
+      });
+      saveState();
+
       const today = new Date().toISOString().split('T')[0];
       const dateInput = document.getElementById('input-date');
       if (dateInput) {
         dateInput.value = today;
       }
       updateDateDisplay(today);
+      updateFocusBadge();
       renderHistory();
-      renderProgressionView();
 
       if (progState.activeWorkout && progState.activeWorkout.workoutData) {
         resumeActiveWorkout();
