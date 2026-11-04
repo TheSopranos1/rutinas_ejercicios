@@ -75,7 +75,12 @@
           <h1 class="text-lg font-bold tracking-tight text-white leading-none">Rutinas</h1>
         </div>
       </div>
-      <div id="nav-btn" class="hidden"></div>
+      <div class="flex items-center gap-2">
+        <button onclick="showGoals()" class="text-xs bg-slate-800 text-amber-400 border border-slate-700 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:bg-slate-700 transition">
+          <i class="fa-solid fa-trophy text-amber-400"></i>
+          <span>Objetivos</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -249,16 +254,33 @@
           <div>
             <h2 class="text-lg font-bold text-white flex items-center gap-2">
               <i class="fa-solid fa-trophy text-amber-400"></i>
-              <span>Árbol de Habilidades</span>
+              <span>Mis Objetivos</span>
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Supera los hitos de cada nivel para desbloquear nuevos ejercicios en tus entrenamientos.
+              Lista de objetivos y metas a alcanzar con sus tutoriales.
             </p>
           </div>
         </div>
 
-        <div id="skills-tree-list" class="space-y-5 pt-2">
-          <!-- Árbol inyectado por JS -->
+        <!-- Formulario Agregar Nuevo Objetivo -->
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+            <i class="fa-solid fa-plus text-brand-accent"></i>
+            <span>Agregar Nuevo Objetivo</span>
+          </h3>
+          <div class="space-y-2">
+            <input type="text" id="goal-name-input" placeholder="Nombre del objetivo (ej. Front Lever)" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-accent">
+            <input type="url" id="goal-url-input" placeholder="Enlace de YouTube (https://...)" class="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-accent">
+            <button onclick="addNewGoal()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-black py-2.5 rounded-lg text-xs transition flex items-center justify-center gap-1.5 active:scale-95 shadow-md">
+              <i class="fa-solid fa-check"></i>
+              <span>Guardar Objetivo</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Lista de Objetivos -->
+        <div id="skills-tree-list" class="space-y-3 pt-1">
+          <!-- Objetivos inyectados por JS -->
         </div>
 
         <div class="sticky bottom-4 pt-2 bg-slate-900/95 backdrop-blur-sm border-t border-slate-800 flex gap-2">
@@ -306,89 +328,25 @@
     let isTimerPaused = false;
     let audioCtx = null;
 
-    // DEFINICIÓN DE ÁRBOLES DE HABILIDADES Y OBJETIVOS
-    const SKILL_TREES = {
-      muscleUp: {
-        title: "Objetivo: Muscle Up",
-        badgeColor: "text-amber-400",
-        levels: [
-          {
-            level: 1,
-            name: "Fase 1: Base Estricta de Tracción",
-            unlocked: true,
-            reqText: "Logra 10 reps en Dominadas y 12 reps en Fondos en una misma sesión para desbloquear.",
-            exercises: [
-              { name: "Dominadas Estrictas", load: "Peso Corporal", isTime: false, targetReps: 10, url: "https://www.youtube.com/shorts/6E3tt4ajzSs", desc: "4 series x Máximas reps" },
-              { name: "Fondos", load: "Peso Corporal", isTime: false, targetReps: 12, url: "https://www.youtube.com/shorts/s5BLhbKWD3E", desc: "4 series x Máximas reps" }
-            ]
-          },
-          {
-            level: 2,
-            name: "Fase 2: Potencia Explosiva y Transición",
-            unlocked: false,
-            reqText: "Logra 6 reps Explosivas y 5 Negativas lentas para desbloquear el nivel final.",
-            exercises: [
-              { name: "Dominadas Explosivas", load: "Peso Corporal", isTime: false, targetReps: 6, url: "https://www.youtube.com/shorts/HnGH_yr80cw", desc: "4 series x Máximas reps" },
-              { name: "Muscle Up Negativo con Salto", load: "Peso Corporal", isTime: false, targetReps: 5, url: "https://www.youtube.com/shorts/xNRM4tEUtDA", desc: "4 series x Máximas reps (>4s bajada)" }
-            ]
-          },
-          {
-            level: 3,
-            name: "Fase 3: Muscle Up Completo",
-            unlocked: false,
-            reqText: "¡Habilidad máxima desbloqueada! Ejecuta y consolida la técnica.",
-            exercises: [
-              { name: "Muscle Up Estricto / Asistido", load: "Peso Corporal", isTime: false, targetReps: 1, url: "https://www.youtube.com/shorts/oHdMd7RPUt4", desc: "4 series x Máximas reps" }
-            ]
-          }
-        ]
-      },
-      handstand: {
-        title: "Objetivo: El Pino / Handstand",
-        badgeColor: "text-sky-400",
-        levels: [
-          {
-            level: 1,
-            name: "Fase 1: Fuerza de Hombro y Tríceps",
-            unlocked: true,
-            reqText: "Logra 10 reps en Flexiones en Pica para desbloquear la segunda fase.",
-            exercises: [
-              { name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, targetReps: 10, url: "https://www.youtube.com/shorts/89-8waE2XKI", desc: "4 series x Máximas reps" }
-            ]
-          },
-          {
-            level: 2,
-            name: "Fase 2: Postura Isométrica y Soporte",
-            unlocked: false,
-            reqText: "Consigue 15s en Enanito y 30s de Pino en Pared para desbloquear el Pino Libre.",
-            exercises: [
-              { name: "Agarre Enanito (Frog Stand)", load: "Peso Corporal", isTime: true, targetReps: 15, url: "https://www.youtube.com/shorts/ep5PwL6KKEs", desc: "4 series x Máximos segundos" },
-              { name: "Pino en Pared (Chest-to-Wall)", load: "Peso Corporal", isTime: true, targetReps: 30, url: "https://www.youtube.com/shorts/TYpyxNCCdHc", desc: "4 series x Máximos segundos" }
-            ]
-          },
-          {
-            level: 3,
-            name: "Fase 3: Pino Libre y Semipress",
-            unlocked: false,
-            reqText: "¡Habilidad máxima desbloqueada! Domina la vertical a fuerza libre.",
-            exercises: [
-              { name: "Semipress a Vertical", load: "Peso Corporal", isTime: false, targetReps: 3, url: "https://www.youtube.com/shorts/862lhECl9Dk", desc: "4 series x Máximas reps" },
-              { name: "Pino Libre", load: "Peso Corporal", isTime: true, targetReps: 10, url: "https://www.youtube.com/shorts/862lhECl9Dk", desc: "4 series x Máximos segundos" }
-            ]
-          }
-        ]
-      }
-    };
+    // OBJETIVOS DEFAULT
+    const DEFAULT_GOALS = [
+      { id: 'g_mu', name: "Muscle Up", url: "https://www.youtube.com/shorts/oHdMd7RPUt4" },
+      { id: 'g_hs', name: "Pino", url: "https://www.youtube.com/shorts/862lhECl9Dk" }
+    ];
 
     // ESTADO DE PERSISTENCIA
     let progState = JSON.parse(localStorage.getItem('calisthenics_state')) || {
-      unlockedLevels: { muscleUp: 1, handstand: 1 },
       records: {},
       lastFocusType: null,
       cyclePool: [],
       history: [],
-      activeWorkout: null
+      activeWorkout: null,
+      goals: DEFAULT_GOALS
     };
+
+    if (!progState.goals || progState.goals.length === 0) {
+      progState.goals = DEFAULT_GOALS;
+    }
 
     function saveState() {
       localStorage.setItem('calisthenics_state', JSON.stringify(progState));
@@ -439,61 +397,35 @@
       const focusType = getRandomFocusType();
       let list = [];
 
-      const muLvl = progState.unlockedLevels.muscleUp || 1;
-      const hsLvl = progState.unlockedLevels.handstand || 1;
-
       if (focusType === 0) {
         // SESIÓN A: Empuje + Tracción Vertical
-        const habEx = muLvl >= 2
-          ? { name: "Muscle Up Negativo con Salto", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/xNRM4tEUtDA", desc: "4 series x Máximas reps (>4s bajada)" }
-          : { name: "Dominadas Estrictas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/6E3tt4ajzSs", desc: "4 series x Máximas reps" };
-
         list = [
-          { pos: "1. Habilidad (Tirón Vertical)", ...habEx },
+          { pos: "1. Habilidad (Tirón Vertical)", name: "Dominadas Estrictas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/6E3tt4ajzSs", desc: "4 series x Máximas reps" },
           { pos: "2. Tracción", name: "Remo", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/-RngKKzbEnI", desc: "4 series x Máximas reps" },
-          { pos: "3. Empuje", name: "Flexiones Declinadas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/5Nm2wr3CgNA", desc: "4 series x Máximas reps" },
+          { pos: "3. Empuje", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/s5BLhbKWD3E", desc: "4 series x Máximas reps" },
           { pos: "4. Pierna", name: "Sentadilla", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/2KbVt1Gl0VM", desc: "4 series x Máximas reps" },
           { pos: "5. Core / Agarre", name: "Rueda Abdominal", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/lhYSUUWaFEU", desc: "3 series x Máximas reps" }
         ];
 
       } else if (focusType === 1) {
         // SESIÓN B: Tracción + Handstand
-        const tracEx = muLvl >= 2
-          ? { name: "Dominadas Explosivas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/HnGH_yr80cw", desc: "4 series x Máximas reps" }
-          : { name: "Dominadas Supinas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/P-ewAI7ns5E", desc: "4 series x Máximas reps" };
-
-        if (hsLvl >= 2) {
-          list = [
-            { pos: "1a. Habilidad (Pino en Pared)", name: "Pino en Pared (Chest-to-Wall)", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/TYpyxNCCdHc", desc: "4 series x Máximos segundos" },
-            { pos: "1b. Complemento Handstand", name: "Agarre Enanito (Frog Stand)", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/ep5PwL6KKEs", desc: "3 series x Máximos segundos" },
-            { pos: "2. Tracción", ...tracEx },
-            { pos: "3. Empuje", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/s5BLhbKWD3E", desc: "4 series x Máximas reps" },
-            { pos: "4. Pierna", name: "Zancadas", load: "Mancuerna 25 kg / Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/fdC1hVc0DeE", desc: "4 series x Máximas reps" },
-            { pos: "5. Core / Agarre", name: "Elevación de Rodillas a Pecho", load: "Peso Corporal en Paralelas", isTime: false, url: "https://www.youtube.com/shorts/HBvQGkHGpyc", desc: "3 series x Máximas reps" }
-          ];
-        } else {
-          list = [
-            { pos: "1. Habilidad (Handstand)", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/89-8waE2XKI", desc: "4 series x Máximas reps" },
-            { pos: "2. Tracción", ...tracEx },
-            { pos: "3. Empuje", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/s5BLhbKWD3E", desc: "4 series x Máximas reps" },
-            { pos: "4. Pierna", name: "Zancadas", load: "Mancuerna 25 kg / Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/fdC1hVc0DeE", desc: "4 series x Máximas reps" },
-            { pos: "5. Core / Agarre", name: "Elevación de Rodillas a Pecho", load: "Peso Corporal en Paralelas", isTime: false, url: "https://www.youtube.com/shorts/HBvQGkHGpyc", desc: "3 series x Máximas reps" }
-          ];
-        }
+        list = [
+          { pos: "1. Habilidad (Handstand)", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/c7usCtboq5k", desc: "4 series x Máximas reps" },
+          { pos: "2. Tracción", name: "Dominadas Supinas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/P-ewAI7ns5E", desc: "4 series x Máximas reps" },
+          { pos: "3. Empuje", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/s5BLhbKWD3E", desc: "4 series x Máximas reps" },
+          { pos: "4. Pierna", name: "Zancadas", load: "Mancuerna 25 kg / Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/fdC1hVc0DeE", desc: "4 series x Máximas reps" },
+          { pos: "5. Core / Agarre", name: "Elevación de Rodillas a Pecho", load: "Peso Corporal en Paralelas", isTime: false, url: "https://www.youtube.com/shorts/HBvQGkHGpyc", desc: "3 series x Máximas reps" }
+        ];
 
       } else {
         // SESIÓN C: Fuerza General + Puntos Débiles
         list = [
-          { pos: "1. Tracción Horizontal", name: "Remo invertido en paralelas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/d96u1uOOpDQ", desc: "4 series x Máximas reps" },
-          { pos: "2. Empuje Vertical", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/89-8waE2XKI", desc: "4 series x Máximas reps" },
+          { pos: "1. Tracción Horizontal", name: "Remo Invertido", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/B1tWCiStY_o", desc: "4 series x Máximas reps" },
+          { pos: "2. Empuje Vertical", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/c7usCtboq5k", desc: "4 series x Máximas reps" },
           { pos: "3. Pierna", name: "Sentadilla", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/2KbVt1Gl0VM", desc: "4 series x Máximas reps" },
           { pos: "4. Bíceps / Aislamiento", name: "Curl concentrado", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/JM6T3kun48k", desc: "3 series x Máximas reps" },
-          { pos: "5. Core / Agarre", name: "Colgado Pasivo (Dead Hang)", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/Y7uuRKP9Lzs", desc: "3 series x Máximos segundos" }
+          { pos: "5. Core / Agarre", name: "Colgado Flexionado", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/Rc7vTQHi2h0", desc: "3 series x Máximos segundos" }
         ];
-
-        if (hsLvl >= 2) {
-          list.push({ pos: "6. Complemento Handstand", name: "Pino en Pared (Chest-to-Wall)", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/TYpyxNCCdHc", desc: "2 series x 15-20 seg (técnica, no al fallo)" });
-        }
       }
 
       currentWorkoutData = list;
@@ -511,9 +443,7 @@
         workoutData: currentWorkoutData,
         guidedIndex: guidedIndex,
         completedSetsMap: completedSetsMap,
-        createdTime: Date.now(),
-        muLvl: muLvl,
-        hsLvl: hsLvl
+        createdTime: Date.now()
       };
 
       saveState();
@@ -820,10 +750,77 @@
       progState.activeWorkout = null;
       saveState();
 
-      checkSkillUnlocks();
       resetTimer();
       showDashboard();
       renderHistory();
+    }
+
+    // HISTORIAL Y NAVEGACIÓN
+    function renderHistory() {
+      const historyList = document.getElementById('history-list');
+      const historyCount = document.getElementById('history-count');
+      if (!historyList) return;
+
+      const history = progState.history || [];
+      if (historyCount) historyCount.innerText = `${history.length} Sesiones`;
+
+      historyList.innerHTML = '';
+
+      if (history.length === 0) {
+        historyList.innerHTML = `<p class="text-xs text-slate-500 italic py-3 text-center">Sin entrenamientos registrados aún.</p>`;
+        return;
+      }
+
+      const sorted = [...history].reverse();
+      sorted.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = "flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs";
+        
+        const [year, month, day] = item.date.split('-');
+        const formattedDate = new Date(year, month - 1, day).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+
+        row.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span class="font-bold text-white">${item.title}</span>
+            <span class="text-slate-400">• ${formattedDate}</span>
+          </div>
+          <button onclick="deleteHistoryEntry(${item.id})" class="text-slate-500 hover:text-rose-400 px-2 py-1">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        `;
+        historyList.appendChild(row);
+      });
+    }
+
+    function deleteHistoryEntry(id) {
+      progState.history = progState.history.filter(item => item.id !== id);
+      saveState();
+      renderHistory();
+    }
+
+    function updateBannerStatus() {
+      const banner = document.getElementById('active-session-banner');
+      const bannerInfo = document.getElementById('active-banner-info');
+      
+      if (progState.activeWorkout && progState.activeWorkout.workoutData) {
+        const title = progState.activeWorkout.focusTitle || "Sesión";
+        const curEx = progState.activeWorkout.guidedIndex + 1;
+        const totalEx = progState.activeWorkout.workoutData.length;
+        bannerInfo.innerText = `${title} • Ejercicio ${curEx} de ${totalEx}`;
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    function showDashboard() {
+      document.getElementById('view-workout').classList.add('hidden');
+      document.getElementById('view-progression').classList.add('hidden');
+      document.getElementById('view-dashboard').classList.remove('hidden');
+      updateFocusBadge();
+      updateBannerStatus();
+      window.scrollTo(0, 0);
     }
 
     // AUDIO & TEMPORIZADOR
@@ -982,136 +979,83 @@
       document.getElementById('timer-status-badge').className = "text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold";
     }
 
-    // VISTA Y ÁRBOLES DE HABILIDAD
-    function renderSkillsTree() {
+    // VISTA Y GESTIÓN DE OBJETIVOS
+    function renderGoalsList() {
       const container = document.getElementById('skills-tree-list');
       if (!container) return;
 
       container.innerHTML = '';
 
-      Object.keys(SKILL_TREES).forEach(treeKey => {
-        const tree = SKILL_TREES[treeKey];
-        const unlockedLvl = progState.unlockedLevels[treeKey] || 1;
+      const goals = progState.goals || [];
 
-        const wrapper = document.createElement('div');
-        wrapper.className = "bg-slate-950 rounded-2xl p-4 border border-slate-800 space-y-4";
-
-        let levelsHtml = '';
-        tree.levels.forEach(lvl => {
-          const isUnlocked = lvl.level <= unlockedLvl;
-
-          let exListHtml = '';
-          lvl.exercises.forEach(ex => {
-            const rec = progState.records[ex.name] || 0;
-            exListHtml += `
-              <div class="flex justify-between items-center text-xs bg-slate-900/80 p-2.5 rounded-xl border border-slate-800">
-                <div>
-                  <span class="font-bold text-white block">${ex.name}</span>
-                  <span class="text-[10px] text-slate-400">Meta: ≥ ${ex.targetReps} ${ex.isTime ? 'seg' : 'reps'}</span>
-                </div>
-                <div class="text-right">
-                  <span class="text-[10px] text-amber-400 font-bold block">Récord: ${rec} ${ex.isTime ? 'seg' : 'reps'}</span>
-                  <a href="${ex.url}" target="_blank" class="text-[10px] text-rose-400 hover:underline">Ver Técnica</a>
-                </div>
-              </div>
-            `;
-          });
-
-          levelsHtml += `
-            <div class="p-3 rounded-xl border ${isUnlocked ? 'bg-slate-900/50 border-emerald-500/30' : 'bg-slate-900/20 border-slate-800/80 opacity-70'} space-y-2">
-              <div class="flex justify-between items-center">
-                <span class="text-xs font-black ${isUnlocked ? 'text-emerald-400' : 'text-slate-500'}">
-                  ${isUnlocked ? '<i class="fa-solid fa-lock-open mr-1"></i>' : '<i class="fa-solid fa-lock mr-1"></i>'}
-                  ${lvl.name}
-                </span>
-                ${isUnlocked ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-black px-2 py-0.5 rounded-md">ACTIVO</span>' : ''}
-              </div>
-              <p class="text-[11px] text-slate-400 italic">${lvl.reqText}</p>
-              <div class="space-y-1.5 pt-1">
-                ${exListHtml}
-              </div>
-            </div>
-          `;
-        });
-
-        wrapper.innerHTML = `
-          <div class="flex justify-between items-center border-b border-slate-800 pb-2">
-            <h3 class="font-black text-sm text-white ${tree.badgeColor}">${tree.title}</h3>
-            <span class="text-xs font-bold text-slate-400">Nivel ${unlockedLvl} de ${tree.levels.length}</span>
-          </div>
-          <div class="space-y-3">
-            ${levelsHtml}
-          </div>
-        `;
-
-        container.appendChild(wrapper);
-      });
-    }
-
-    function renderHistory() {
-      const historyList = document.getElementById('history-list');
-      const historyCount = document.getElementById('history-count');
-      if (!historyList) return;
-
-      const history = progState.history || [];
-      if (historyCount) historyCount.innerText = `${history.length} Sesiones`;
-
-      historyList.innerHTML = '';
-
-      if (history.length === 0) {
-        historyList.innerHTML = `<p class="text-xs text-slate-500 italic py-3 text-center">Sin entrenamientos registrados aún.</p>`;
+      if (goals.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-500 italic py-4 text-center">No tienes objetivos guardados.</p>`;
         return;
       }
 
-      const sorted = [...history].reverse();
-      sorted.forEach((item) => {
-        const row = document.createElement('div');
-        row.className = "flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800 text-xs";
-        
-        const [year, month, day] = item.date.split('-');
-        const formattedDate = new Date(year, month - 1, day).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
-
-        row.innerHTML = `
-          <div class="flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            <span class="font-bold text-white">${item.title}</span>
-            <span class="text-slate-400">• ${formattedDate}</span>
+      goals.forEach(goal => {
+        const item = document.createElement('div');
+        item.className = "bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex justify-between items-center shadow-sm";
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-amber-400/10 text-amber-400 border border-amber-400/20 flex items-center justify-center font-black text-sm">
+              <i class="fa-solid fa-bullseye"></i>
+            </div>
+            <span class="font-bold text-white text-sm">${goal.name}</span>
           </div>
-          <button onclick="deleteHistoryEntry(${item.id})" class="text-slate-500 hover:text-rose-400 px-2 py-1">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
+          <div class="flex items-center gap-2">
+            <a href="${goal.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 text-xs font-bold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 px-3 py-1.5 rounded-xl transition active:scale-95 shadow-sm">
+              <i class="fa-brands fa-youtube text-rose-500 text-sm"></i>
+              <span>Ver Video</span>
+            </a>
+            <button onclick="deleteGoal('${goal.id}')" class="text-slate-500 hover:text-rose-400 p-1.5 transition">
+              <i class="fa-solid fa-trash-can text-xs"></i>
+            </button>
+          </div>
         `;
-        historyList.appendChild(row);
+        container.appendChild(item);
       });
     }
 
-    function deleteHistoryEntry(id) {
-      progState.history = progState.history.filter(item => item.id !== id);
-      saveState();
-      renderHistory();
-    }
+    function addNewGoal() {
+      const nameInput = document.getElementById('goal-name-input');
+      const urlInput = document.getElementById('goal-url-input');
 
-    function updateBannerStatus() {
-      const banner = document.getElementById('active-session-banner');
-      const bannerInfo = document.getElementById('active-banner-info');
-      
-      if (progState.activeWorkout && progState.activeWorkout.workoutData) {
-        const title = progState.activeWorkout.focusTitle || "Sesión";
-        const curEx = progState.activeWorkout.guidedIndex + 1;
-        const totalEx = progState.activeWorkout.workoutData.length;
-        bannerInfo.innerText = `${title} • Ejercicio ${curEx} de ${totalEx}`;
-        banner.classList.remove('hidden');
-      } else {
-        banner.classList.add('hidden');
+      const name = nameInput.value.trim();
+      const url = urlInput.value.trim();
+
+      if (!name || !url) {
+        showModal("Campo requerido", "Por favor ingresa tanto el nombre como el enlace de YouTube del objetivo.", () => {});
+        return;
       }
+
+      if (!progState.goals) progState.goals = [];
+
+      progState.goals.push({
+        id: 'g_' + Date.now(),
+        name: name,
+        url: url
+      });
+
+      saveState();
+
+      nameInput.value = '';
+      urlInput.value = '';
+
+      renderGoalsList();
     }
 
-    function showDashboard() {
+    function deleteGoal(id) {
+      progState.goals = (progState.goals || []).filter(g => g.id !== id);
+      saveState();
+      renderGoalsList();
+    }
+
+    function showGoals() {
+      document.getElementById('view-dashboard').classList.add('hidden');
       document.getElementById('view-workout').classList.add('hidden');
-      document.getElementById('view-progression').classList.add('hidden');
-      document.getElementById('view-dashboard').classList.remove('hidden');
-      updateFocusBadge();
-      updateBannerStatus();
+      document.getElementById('view-progression').classList.remove('hidden');
+      renderGoalsList();
       window.scrollTo(0, 0);
     }
 
@@ -1154,7 +1098,10 @@
         "Dominadas Pronadas Estrictas": "Dominadas Estrictas",
         "Fondos en Paralelas": "Fondos",
         "Dominadas Explosivas al Pecho": "Dominadas Explosivas",
-        "Flexiones en Pica (Pike Pushups)": "Flexiones en Pica"
+        "Flexiones en Pica (Pike Pushups)": "Flexiones en Pica",
+        "Colgado Pasivo (Dead Hang)": "Colgado Flexionado",
+        "Colgado Flexionado (Bent Arm Hang)": "Colgado Flexionado",
+        "Remo invertido en paralelas": "Remo Invertido"
       };
       Object.entries(recordMigrations).forEach(([oldName, newName]) => {
         if (progState.records[oldName] !== undefined && progState.records[newName] === undefined) {
