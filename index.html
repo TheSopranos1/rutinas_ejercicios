@@ -119,12 +119,28 @@
         </div>
       </div>
 
-      <!-- Indicador de Próxima Sesión -->
-      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3 shadow-sm">
+      <!-- Indicador de Próxima Sesión + Selector Modo Lluvia -->
+      <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-4 shadow-sm">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
           <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Siguiente Entrenamiento</span>
         </div>
         
+        <!-- Toggle Modo Lluvia / Interior -->
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-3 flex items-center justify-between cursor-pointer" onclick="toggleRainMode()">
+          <div class="flex items-center gap-3">
+            <div id="rain-mode-icon" class="w-9 h-9 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center text-lg transition-colors">
+              <i class="fa-solid fa-sun"></i>
+            </div>
+            <div>
+              <p id="rain-mode-title" class="text-xs font-bold text-slate-200">Modo Calistenia Normal</p>
+              <p id="rain-mode-desc" class="text-[10px] text-slate-400">Entrenamiento principal en parque/casa</p>
+            </div>
+          </div>
+          <div id="rain-mode-toggle" class="w-11 h-6 bg-slate-800 rounded-full p-1 transition-colors duration-200 flex items-center">
+            <div id="rain-mode-dot" class="w-4 h-4 rounded-full bg-slate-400 transition-transform duration-200 transform translate-x-0"></div>
+          </div>
+        </div>
+
         <button onclick="confirmNextWorkout()" class="w-full bg-brand-500 hover:bg-brand-600 text-slate-950 font-black py-4 rounded-xl text-base shadow-lg shadow-brand-500/20 flex items-center justify-center gap-2 transition active:scale-[0.98]">
           <i class="fa-solid fa-play text-lg"></i>
           <span>GENERAR MI ENTRENAMIENTO</span>
@@ -167,11 +183,11 @@
         
         <div class="bg-slate-900 rounded-2xl p-3 border border-slate-800 space-y-1.5">
           <div class="flex justify-between text-xs font-bold">
-            <span id="guided-step-text" class="text-slate-300">Ejercicio 1 de 6</span>
-            <span id="guided-step-percent" class="text-brand-accent">16%</span>
+            <span id="guided-step-text" class="text-slate-300">Ejercicio 1 de 5</span>
+            <span id="guided-step-percent" class="text-brand-accent">20%</span>
           </div>
           <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-800">
-            <div id="guided-progress-bar" class="bg-brand-500 h-full transition-all duration-300 rounded-full" style="width: 16%;"></div>
+            <div id="guided-progress-bar" class="bg-brand-500 h-full transition-all duration-300 rounded-full" style="width: 20%;"></div>
           </div>
         </div>
 
@@ -180,7 +196,7 @@
           <!-- Contenido inyectado dinámicamente -->
         </div>
 
-        <!-- SECCIÓN TEMPORIZADOR INTEGRADO (1 MINUTO Y 2 MINUTOS PRESET) -->
+        <!-- SECCIÓN TEMPORIZADOR INTEGRADO -->
         <div class="bg-slate-900 rounded-2xl p-4 border border-slate-800 space-y-3 shadow-md">
           <div class="flex justify-between items-center border-b border-slate-800 pb-2">
             <div class="flex items-center gap-2">
@@ -317,6 +333,7 @@
     let guidedIndex = 0;
     let completedSetsMap = {};
     let isListView = false;
+    let isRainModeActive = false;
 
     // ESTADO DEL TEMPORIZADOR
     let timerInterval = null;
@@ -352,6 +369,32 @@
       localStorage.setItem('calisthenics_state', JSON.stringify(progState));
     }
 
+    // Alternar selector Modo Lluvia / Interior
+    function toggleRainMode() {
+      isRainModeActive = !isRainModeActive;
+      const icon = document.getElementById('rain-mode-icon');
+      const title = document.getElementById('rain-mode-title');
+      const desc = document.getElementById('rain-mode-desc');
+      const toggleBg = document.getElementById('rain-mode-toggle');
+      const toggleDot = document.getElementById('rain-mode-dot');
+
+      if (isRainModeActive) {
+        icon.className = "w-9 h-9 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center text-lg transition-colors border border-sky-500/30";
+        icon.innerHTML = `<i class="fa-solid fa-cloud-showers-heavy"></i>`;
+        title.innerText = "Modo Lluvia / Bajo Techo 🌧️";
+        desc.innerText = "Rutina alternativa con mancuernas en casa";
+        toggleBg.className = "w-11 h-6 bg-sky-500 rounded-full p-1 transition-colors duration-200 flex items-center";
+        toggleDot.className = "w-4 h-4 rounded-full bg-slate-950 transition-transform duration-200 transform translate-x-5";
+      } else {
+        icon.className = "w-9 h-9 rounded-lg bg-slate-800 text-slate-400 flex items-center justify-center text-lg transition-colors";
+        icon.innerHTML = `<i class="fa-solid fa-sun"></i>`;
+        title.innerText = "Modo Calistenia Normal";
+        desc.innerText = "Entrenamiento principal en parque/casa";
+        toggleBg.className = "w-11 h-6 bg-slate-800 rounded-full p-1 transition-colors duration-200 flex items-center";
+        toggleDot.className = "w-4 h-4 rounded-full bg-slate-400 transition-transform duration-200 transform translate-x-0";
+      }
+    }
+
     // Selección por ciclo completo (Shuffle Pool)
     function getRandomFocusType() {
       if (!progState.cyclePool || progState.cyclePool.length === 0) {
@@ -371,13 +414,12 @@
       return progState.cyclePool[0];
     }
 
-    function getFocusName(type) {
-      if (type === 0) return "Sesión A";
-      if (type === 1) return "Sesión B";
-      return "Sesión C";
+    function getFocusName(type, isRain = false) {
+      if (isRain) return "Sesión Lluvia / Casa 🌧️";
+      if (type === 0) return "Sesión A (Foco Muscle Up)";
+      if (type === 1) return "Sesión B (Foco Pino)";
+      return "Sesión C (Fuerza & Integración)";
     }
-
-    function updateFocusBadge() {}
 
     function confirmNextWorkout() {
       if (progState.activeWorkout) {
@@ -394,38 +436,55 @@
     }
 
     function generateNextWorkout() {
-      const focusType = getRandomFocusType();
       let list = [];
+      let focusType = null;
+      let sessionTitle = "";
 
-      if (focusType === 0) {
-        // SESIÓN A: Empuje + Tracción Vertical
+      if (isRainModeActive) {
+        // RUTINA ALTERNATIVA DE LLUVIA / BAJO TECHO
+        sessionTitle = getFocusName(null, true);
         list = [
-          { pos: "1. Habilidad (Tirón Vertical)", name: "Dominadas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/aUqc3c1p6Os", desc: "4 series x Máximas reps" },
-          { pos: "2. Tracción", name: "Remo", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/2M66_noYESI", desc: "4 series x Máximas reps" },
-          { pos: "3. Empuje", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/uw6DARtlLgY", desc: "4 series x Máximas reps" },
-          { pos: "4. Pierna", name: "Sentadilla", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/2KbVt1Gl0VM", desc: "4 series x Máximas reps" },
-          { pos: "5. Core / Agarre", name: "Rueda Abdominal", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/lhYSUUWaFEU", desc: "3 series x Máximas reps" }
+          { pos: "1. Tracción Horizontal", name: "Remo con Mancuerna", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/2M66_noYESI", desc: "4 series x Máximas reps" },
+          { pos: "2. Empuje Pecho", name: "Flexiones Declinadas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/elP1J_cmMFY", desc: "4 series x Máximas reps" },
+          { pos: "3. Bíceps / Aislamiento", name: "Curl Concentrado", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/JM6T3kun48k", desc: "3 series x Máximas reps" },
+          { pos: "4. Pierna", name: "Sentadilla Goblet", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/2KbVt1Gl0VM", desc: "4 series x Máximas reps" },
+          { pos: "5. Core / Abdomen", name: "Rueda Abdominal", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/lhYSUUWaFEU", desc: "3 series x Máximas reps" }
         ];
-
-      } else if (focusType === 1) {
-        // SESIÓN B: Tracción + Handstand
-        list = [
-          { pos: "1. Habilidad (Handstand)", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/c7usCtboq5k", desc: "4 series x Máximas reps" },
-          { pos: "2. Tracción", name: "Dominadas Supinas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/P-ewAI7ns5E", desc: "4 series x Máximas reps" },
-          { pos: "3. Empuje", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/uw6DARtlLgY", desc: "4 series x Máximas reps" },
-          { pos: "4. Pierna", name: "Zancadas", load: "Mancuerna 25 kg / Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/fdC1hVc0DeE", desc: "4 series x Máximas reps" },
-          { pos: "5. Core / Agarre", name: "Elevación de Rodillas a Pecho", load: "Peso Corporal en Paralelas", isTime: false, url: "https://www.youtube.com/shorts/HBvQGkHGpyc", desc: "3 series x Máximas reps" }
-        ];
-
       } else {
-        // SESIÓN C: Fuerza General + Puntos Débiles
-        list = [
-          { pos: "1. Tracción Horizontal", name: "Remo Invertido", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/B1tWCiStY_o", desc: "4 series x Máximas reps" },
-          { pos: "2. Empuje Vertical", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/c7usCtboq5k", desc: "4 series x Máximas reps" },
-          { pos: "3. Pierna", name: "Sentadilla", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/2KbVt1Gl0VM", desc: "4 series x Máximas reps" },
-          { pos: "4. Bíceps / Aislamiento", name: "Curl concentrado", load: "Mancuerna 25 kg", isTime: false, url: "https://www.youtube.com/shorts/JM6T3kun48k", desc: "3 series x Máximas reps" },
-          { pos: "5. Core / Agarre", name: "Colgado Flexionado", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/Rc7vTQHi2h0", desc: "3 series x Máximos segundos" }
-        ];
+        // MODO CALISTENIA PRINCIPAL
+        focusType = getRandomFocusType();
+        sessionTitle = getFocusName(focusType, false);
+
+        if (focusType === 0) {
+          // SESIÓN A: Potencia Muscle Up & Empuje
+          list = [
+            { pos: "1. Potencia (Tracción Vertical)", name: "Dominadas Estrictas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/aUqc3c1p6Os", desc: "4 series x Máximas reps" },
+            { pos: "2. Empuje Vertical / Fondo", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/uw6DARtlLgY", desc: "4 series x Máximas reps" },
+            { pos: "3. Tracción Horizontal", name: "Dominadas Australianas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/Gmzw2w_5774", desc: "4 series x Máximas reps" },
+            { pos: "4. Pierna", name: "Sentadillas Goblet", load: "Mancuerna 25 kg / Peso Corp.", isTime: false, url: "https://www.youtube.com/shorts/2KbVt1Gl0VM", desc: "4 series x Máximas reps" },
+            { pos: "5. Core", name: "Rueda Abdominal", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/lhYSUUWaFEU", desc: "3 series x Máximas reps" }
+          ];
+
+        } else if (focusType === 1) {
+          // SESIÓN B: Habilidad Pino (Handstand)
+          list = [
+            { pos: "1. Habilidad (Pino)", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/c7usCtboq5k", desc: "4 series x Máximas reps" },
+            { pos: "2. Tracción Vertical", name: "Dominadas Supinas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/P-ewAI7ns5E", desc: "4 series x Máximas reps" },
+            { pos: "3. Empuje", name: "Fondos", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/uw6DARtlLgY", desc: "4 series x Máximas reps" },
+            { pos: "4. Pierna", name: "Zancadas", load: "Mancuerna 25 kg / Peso Corp.", isTime: false, url: "https://www.youtube.com/shorts/fdC1hVc0DeE", desc: "4 series x Máximas reps" },
+            { pos: "5. Core", name: "Elevación de Rodillas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/HBvQGkHGpyc", desc: "3 series x Máximas reps" }
+          ];
+
+        } else {
+          // SESIÓN C: Integración de Fuerza & Estabilidad
+          list = [
+            { pos: "1. Empuje Vertical", name: "Flexiones en Pica", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/c7usCtboq5k", desc: "4 series x Máximas reps" },
+            { pos: "2. Tracción Vertical", name: "Dominadas Estrictas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/aUqc3c1p6Os", desc: "4 series x Máximas reps" },
+            { pos: "3. Tracción Horizontal", name: "Dominadas Australianas", load: "Peso Corporal", isTime: false, url: "https://www.youtube.com/shorts/Gmzw2w_5774", desc: "4 series x Máximas reps" },
+            { pos: "4. Pierna", name: "Sentadillas Goblet", load: "Mancuerna 25 kg / Peso Corp.", isTime: false, url: "https://www.youtube.com/shorts/2KbVt1Gl0VM", desc: "4 series x Máximas reps" },
+            { pos: "5. Core / Agarre", name: "Colgado Flexionado", load: "Peso Corporal", isTime: true, url: "https://www.youtube.com/shorts/Rc7vTQHi2h0", desc: "3 series x Máximos segundos" }
+          ];
+        }
       }
 
       currentWorkoutData = list;
@@ -436,10 +495,13 @@
         completedSetsMap[idx] = [0, 0, 0, 0];
       });
 
-      progState.lastFocusType = focusType;
+      if (!isRainModeActive) {
+        progState.lastFocusType = focusType;
+      }
+
       progState.activeWorkout = {
         date: selectedDate,
-        focusTitle: getFocusName(focusType),
+        focusTitle: sessionTitle,
         workoutData: currentWorkoutData,
         guidedIndex: guidedIndex,
         completedSetsMap: completedSetsMap,
@@ -447,7 +509,6 @@
       };
 
       saveState();
-
       renderWorkoutView();
     }
 
@@ -681,56 +742,6 @@
       });
     }
 
-    // VERIFICACIÓN Y DESBLOQUEO DE NIVELES AL FINALIZAR
-    function checkSkillUnlocks() {
-      let newlyUnlocked = [];
-
-      // Evaluar Rama Muscle Up
-      const muLvl = progState.unlockedLevels.muscleUp || 1;
-      if (muLvl === 1) {
-        const domReps = progState.records["Dominadas Estrictas"] || 0;
-        const fonReps = progState.records["Fondos"] || 0;
-        if (domReps >= 10 && fonReps >= 12) {
-          progState.unlockedLevels.muscleUp = 2;
-          newlyUnlocked.push("Muscle Up - Fase 2 (Dominadas Explosivas y Negativas)");
-        }
-      } else if (muLvl === 2) {
-        const expReps = progState.records["Dominadas Explosivas"] || 0;
-        const negReps = progState.records["Muscle Up Negativo con Salto"] || 0;
-        if (expReps >= 6 && negReps >= 5) {
-          progState.unlockedLevels.muscleUp = 3;
-          newlyUnlocked.push("Muscle Up - Fase 3 (Muscle Up Estricto Completo)");
-        }
-      }
-
-      // Evaluar Rama Pino / Handstand
-      const hsLvl = progState.unlockedLevels.handstand || 1;
-      if (hsLvl === 1) {
-        const pikeReps = progState.records["Flexiones en Pica"] || 0;
-        if (pikeReps >= 10) {
-          progState.unlockedLevels.handstand = 2;
-          newlyUnlocked.push("El Pino - Fase 2 (Agarre Enanito y Pino en Pared)");
-        }
-      } else if (hsLvl === 2) {
-        const frogSecs = progState.records["Agarre Enanito (Frog Stand)"] || 0;
-        const wallSecs = progState.records["Pino en Pared (Chest-to-Wall)"] || 0;
-        if (frogSecs >= 15 && wallSecs >= 30) {
-          progState.unlockedLevels.handstand = 3;
-          newlyUnlocked.push("El Pino - Fase 3 (Pino Libre)");
-        }
-      }
-
-      saveState();
-
-      if (newlyUnlocked.length > 0) {
-        showModal(
-          "¡NIVEL DESBLOQUEADO! 🔓🎉",
-          `¡Felicidades! Has superado los requisitos y desbloqueado: ${newlyUnlocked.join(", ")}.`,
-          () => {}
-        );
-      }
-    }
-
     function completeWorkout() {
       const titleName = progState.activeWorkout?.focusTitle || "Sesión";
 
@@ -743,7 +754,8 @@
       
       progState.history.push(entry);
       
-      if (progState.cyclePool && progState.cyclePool.length > 0) {
+      // Avanzar el shuffle pool solo si no era una sesión de lluvia
+      if (!titleName.includes("Lluvia") && progState.cyclePool && progState.cyclePool.length > 0) {
         progState.cyclePool.shift();
       }
 
@@ -818,7 +830,6 @@
       document.getElementById('view-workout').classList.add('hidden');
       document.getElementById('view-progression').classList.add('hidden');
       document.getElementById('view-dashboard').classList.remove('hidden');
-      updateFocusBadge();
       updateBannerStatus();
       window.scrollTo(0, 0);
     }
@@ -1059,10 +1070,6 @@
       window.scrollTo(0, 0);
     }
 
-    function toggleView() {
-      showDashboard();
-    }
-
     function updateDateDisplay(val) {
       if (!val) return;
       selectedDate = val;
@@ -1097,11 +1104,9 @@
       const recordMigrations = {
         "Dominadas Pronadas Estrictas": "Dominadas Estrictas",
         "Fondos en Paralelas": "Fondos",
-        "Dominadas Explosivas al Pecho": "Dominadas Explosivas",
         "Flexiones en Pica (Pike Pushups)": "Flexiones en Pica",
-        "Colgado Pasivo (Dead Hang)": "Colgado Flexionado",
-        "Colgado Flexionado (Bent Arm Hang)": "Colgado Flexionado",
-        "Remo invertido en paralelas": "Remo Invertido"
+        "Remo Invertido": "Dominadas Australianas",
+        "Remo": "Remo con Mancuerna"
       };
       Object.entries(recordMigrations).forEach(([oldName, newName]) => {
         if (progState.records[oldName] !== undefined && progState.records[newName] === undefined) {
@@ -1117,7 +1122,6 @@
         dateInput.value = today;
       }
       updateDateDisplay(today);
-      updateFocusBadge();
       renderHistory();
 
       if (progState.activeWorkout && progState.activeWorkout.workoutData) {
